@@ -1,5 +1,6 @@
 import sys
 import time
+
 from PyQt5.QtWidgets import (
     QApplication,
     QWidget,
@@ -9,28 +10,27 @@ from PyQt5.QtWidgets import (
     QGraphicsView,
 )
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 
 class Step:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
         self.description = kwargs.get("description")
-        self.stepNr = kwargs.get("stepNr")
         self.durationMs = kwargs.get("durationMs")
         self.image = kwargs.get("image")
 
 class StepUI(QWidget):
-    def __init__(self, totalSteps, firstStep=None):
+    def __init__(self, steps=None):
         super().__init__()
         
         # Initialize properties
         self.currentStep = None
-        self.totalSteps = totalSteps
+        self.steps = steps
+        self.totalSteps = len(steps)
 
         # Initialize window
         self.setWindowTitle('Hand Washing Steps')
         self.setStyleSheet("background-color: black")
-        #self.move(0, 0)
 
         # Initialize layouts 
         self.mainLayout = QVBoxLayout()
@@ -62,23 +62,46 @@ class StepUI(QWidget):
         self.timeLbl.setAlignment(Qt.AlignRight | Qt.AlignBottom)
         self.bottomLayout.addWidget(self.timeLbl)
 
-        if firstStep != None:
-            self.setStep(firstStep)
+        if steps != None:
+            self.nextStep()
             self.show()
 
-
-    def setStep(self, step):
-        self.currentStep = step
+    @pyqtSlot()
+    def nextStep(self):
+        self.currentStep = self.steps[0]
+        stepsLeft = len(self.steps)
+        currentStepNr = self.totalSteps - stepsLeft + 1
 
         # Update UI labels
-        durationS = int(step.durationMs / 1000)
+        durationS = int(self.currentStep.durationMs / 1000)
         self.timeLeftLbl.setText(f"Duur: {durationS}s")
-        self.stepNrLbl.setText(f"Stap: {step.stepNr}/{self.totalSteps}")
+        self.stepNrLbl.setText(f"Stap: {currentStepNr}/{self.totalSteps}")
         
         # Update UI image
-        newPhoto = QSvgWidget(step.image)
+        newPhoto = QSvgWidget(self.currentStep.image)
         self.mainLayout.replaceWidget(self.stepPhoto, newPhoto)
         self.stepPhoto = newPhoto
+        
+        # Start timer to call nextStep
+        if stepsLeft > 1:
+            QTimer.singleShot(self.currentStep.durationMs, self.nextStep)
+        
+        # Start timer to decrease time left label
+        self.timeLeftTimer = QTimer()
+        self.timeLeftTimer.timeout.connect(self.decreaseDuration)
+        self.timeLeftTimer.start(200)
+
+        self.steps.pop(0)
+
+    @pyqtSlot()
+    def decreaseDuration(self):
+        self.currentStep.durationMs -= 200
+        durationS = int(self.currentStep.durationMs / 1000)
+
+        if durationS <= 0:
+            self.timeLeftTimer.stop()
+
+        self.timeLeftLbl.setText(f"Duur: {durationS}s")
         
 
     def show(self):
@@ -87,9 +110,12 @@ class StepUI(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    stepUI = StepUI(9, Step(name="Inzepen",
-                            description="Neem zeep uit de zeepdispenser", 
-                            stepNr=1,
-                            durationMs=5_000,
-                            image="images/steps/1.svg"))
+    stepUI = StepUI([Step(name="Inzepen",
+                          description="Neem zeep uit de zeepdispenser", 
+                          durationMs=5_000,
+                          image="images/steps/1.svg"),
+                     Step(name="Wrijven",
+                          description="Wrijf de handpalmen goed over elkaar",
+                          durationMs=15_000,
+                          image="images/steps/2.svg")])
     sys.exit(app.exec_())
