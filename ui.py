@@ -1,5 +1,5 @@
 import sys
-import time
+from datetime import datetime
 import yaml
 from PyQt5.QtWidgets import (
     QApplication,
@@ -7,10 +7,10 @@ from PyQt5.QtWidgets import (
     QLabel,
     QVBoxLayout,
     QHBoxLayout, 
-    QGraphicsView,
 )
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
+from PyQt5.QtGui import QFont
 
 
 
@@ -29,7 +29,7 @@ class StepUI(QWidget):
         
         # Initialize properties
         self.currentStep = None
-        self.steps = steps
+        self.stepQueue = steps
         self.totalSteps = len(steps)
 
         # Initialize window
@@ -50,30 +50,43 @@ class StepUI(QWidget):
 
         # Initialize time left label and add to layout
         self.timeLeftLbl = QLabel()
+        self.timeLeftLbl.setFont(QFont('Arial', 20))
         self.timeLeftLbl.setStyleSheet('color: white')
         self.timeLeftLbl.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         self.topLayout.addWidget(self.timeLeftLbl)
 
         # Initialize step label and add to layout
         self.stepNrLbl = QLabel()
+        self.stepNrLbl.setFont(QFont('Arial', 20))
         self.stepNrLbl.setStyleSheet('color: white')
         self.stepNrLbl.setAlignment(Qt.AlignRight | Qt.AlignTop)
         self.topLayout.addWidget(self.stepNrLbl)
 
         # Initialize current time label and add to layout
-        self.timeLbl = QLabel()
+        time = datetime.strftime(datetime.now(), "%d/%m/%y %H:%M")
+        self.timeLbl = QLabel(f"Tijd: {time}")
+        self.timeLbl.setFont(QFont('Arial', 20))
         self.timeLbl.setStyleSheet('color: white')
         self.timeLbl.setAlignment(Qt.AlignRight | Qt.AlignBottom)
         self.bottomLayout.addWidget(self.timeLbl)
 
+        # Start timer for current time
+        self.clockTimer = QTimer()
+        self.clockTimer.timeout.connect(self._updateClock)
+        self.clockTimer.start(1000)
+
+        # Start showing steps
         if steps != None:
-            self.nextStep()
+            self._nextStep()
             self.show()
 
+
     @pyqtSlot()
-    def nextStep(self):
-        self.currentStep = self.steps[0]
-        stepsLeft = len(self.steps)
+    def _nextStep(self):
+
+        # Calculate steps left and current step nr
+        self.currentStep = self.stepQueue[0]
+        stepsLeft = len(self.stepQueue)
         currentStepNr = self.totalSteps - stepsLeft + 1
 
         # Update UI labels
@@ -88,17 +101,18 @@ class StepUI(QWidget):
         
         # Start timer to call nextStep
         if stepsLeft > 1:
-            QTimer.singleShot(self.currentStep.durationMs, self.nextStep)
+            QTimer.singleShot(self.currentStep.durationMs, self._nextStep)
         
         # Start timer to decrease time left label
         self.timeLeftTimer = QTimer()
-        self.timeLeftTimer.timeout.connect(self.decreaseDuration)
+        self.timeLeftTimer.timeout.connect(self._decreaseDuration)
         self.timeLeftTimer.start(200)
 
-        self.steps.pop(0)
+        self.stepQueue.pop(0)
+
 
     @pyqtSlot()
-    def decreaseDuration(self):
+    def _decreaseDuration(self):
         self.currentStep.durationMs -= 200
         durationS = int(self.currentStep.durationMs / 1000)
 
@@ -107,6 +121,15 @@ class StepUI(QWidget):
 
         self.timeLeftLbl.setText(f"Duur: {durationS}s")
         
+
+    @pyqtSlot()
+    def _updateClock(self):
+        
+        # Set current time
+        time = datetime.strftime(datetime.now(), "%d/%m/%y %H:%M")
+        self.timeLbl.setText(f"Tijd: {time}")
+
+
 
     def show(self):
         self.showFullScreen()
