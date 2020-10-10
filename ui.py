@@ -1,6 +1,6 @@
 import sys
 import time
-
+import yaml
 from PyQt5.QtWidgets import (
     QApplication,
     QWidget,
@@ -12,12 +12,16 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 
+
+
 class Step:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
         self.description = kwargs.get("description")
         self.durationMs = kwargs.get("durationMs")
         self.image = kwargs.get("image")
+
+
 
 class StepUI(QWidget):
     def __init__(self, steps=None):
@@ -108,14 +112,21 @@ class StepUI(QWidget):
         self.showFullScreen()
 
 
+
 if __name__ == "__main__":
+    with open('steps.yaml') as f:
+        yamlSteps = yaml.safe_load(f)
+    print(yamlSteps["steps"])
+    
+    steps = [
+        Step(
+            name=name,
+            **stepOpt
+        )
+            for step in yamlSteps["steps"] 
+            for (name, stepOpt) in step.items()
+    ]
+    
     app = QApplication(sys.argv)
-    stepUI = StepUI([Step(name="Inzepen",
-                          description="Neem zeep uit de zeepdispenser", 
-                          durationMs=5_000,
-                          image="images/steps/1.svg"),
-                     Step(name="Wrijven",
-                          description="Wrijf de handpalmen goed over elkaar",
-                          durationMs=15_000,
-                          image="images/steps/2.svg")])
+    stepUI = StepUI(steps)
     sys.exit(app.exec_())
