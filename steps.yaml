@@ -1,37 +1,37 @@
 steps:
   - Inzepen:
       description: "Neem zeep uit de zeepdispenser"
-      durationMs: 10_000
+      durationS: 10
       image: images/steps/1.svg
   - Handpalmen:
       description: "Wrijf de handpalmen tegen elkaar"
-      durationMs: 15_000
+      durationS: 15
       image: images/steps/2.svg
   - Gekruist rug:
       description: "Wrijf de rechterhandpalm met gekruiste vingers over de linkerhandrug en andersom"
-      durationMs: 20_000
+      durationS: 20
       image: images/steps/3.svg
   - Gekruist palm:
       description: "Wrijf de handpalmen met gekruiste vingers tegen elkaar"
-      durationMs: 20_000
+      durationS: 20
       image: images/steps/4.svg
   - Duim:
       description: "Maak cirkels met je rechterduim in je linkerhand en andersom"
-      durationMs: 20_000
+      durationS: 20
       image: images/steps/5.svg
   - Palm vingertop:
       description: "Maak cirkels met je vingertoppen in je handpalmen"
-      durationMs: 20_000
+      durationS: 20
       image: images/steps/6.svg
   - Spoelen:
       description: "Spoel de zeep van je handen"
-      durationMs: 15_000
+      durationS: 15
       image: images/steps/7.svg
   - Drogen:
       description: "Droog je handen met een wegwerpdoekje of handdroger"
-      durationMs: 15_000
+      durationS: 15
       image: images/steps/8.svg
   - Klaar:
       description: "Je handen zijn zuiver"
-      durationMs: 5_000
+      durationS: 5
       image: images/steps/9.svg
