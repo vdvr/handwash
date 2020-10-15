@@ -1,0 +1,52 @@
+QWidget {
+    background-color: black;
+}
+
+QGraphicsView {
+    border: none;
+}
+
+QLabel {
+    color: white;
+    font: 30pt "Roboto Condensed";
+    font-weight: 400;
+}
+
+QLabel#timeleft {
+    font: 100pt Roboto;
+    font-weight: 500;
+    margin: 20px;
+}
+
+QLabel#steptext {
+    font-weight: 700;
+    margin: 30px 50px 0px;
+}
+
+QLabel#stepnr {
+    font: 60pt Roboto;
+    font-weight: 300;
+    margin: 0px 40px;
+}
+
+QLabel#datesmall {
+    font: 30pt "Roboto Condensed";
+    font-weight: 200;
+    margin: 0px 20px;
+}
+
+QLabel#timesmall {
+    font: 50pt Roboto;
+    font-weight: 700;
+    margin: 0px 20px;
+}
+
+QLabel#datebig {
+    font: 50pt "Roboto Condensed";
+    font-weight: 200;
+}
+
+QLabel#timebig { 
+    font: 80pt Roboto;
+    font-weight: 700;
+}
