@@ -1,5 +1,5 @@
-#ifndef UART_H_
-#define UART_H_
+#ifndef UARTNANO_H_
+#define UARTNANO_H_
 
 #define F_CPU 16000000
 
@@ -7,4 +7,4 @@ void uartSetup(long baudrate);
 
 void uartPutChar(char data);
 
-#endif /* UART_H_ */
+#endif /* UARTNANO_H_ */
