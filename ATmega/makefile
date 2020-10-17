@@ -1,12 +1,15 @@
 #===== Main Options ===========
 
-MCU = atmega32
-F_CPU = 8000000
+#MCU = atmega32		#uncomment for ATmega32
+#F_CPU = 8000000
+
+MCU = atmega328p	#uncomment for arduino nano
+F_CPU = 16000000
 
 TARGET = main
 SRCS = $(TARGET).c ${EXTRA}
 
-EXTRA = board.c
+EXTRA = uartNano.c buffer.c
 
 #===== Compile Options ===========
 
@@ -19,10 +22,15 @@ CFLAGS += -DF_CPU=${F_CPU} -I.
 
 #===== Programming Options =========
 
-AVRDUDE_PROGRAMMER = usbasp
-AVRDUDE_PORT = usb
+#AVRDUDE_PROGRAMMER = usbasp	#uncomment for ATmega32
+#AVRDUDE_PORT = usb
 
-AVRDUDE_FLAGS = -p ${MCU} -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT) -F
+AVRDUDE_PROGRAMMER = arduino	#uncomment for arduino nano
+AVRDUDE_PORT = /dev/cu.usbserial-14*
+
+#AVRDUDE_FLAGS = -p ${MCU} -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT) -F	#uncomment for ATmega32
+
+AVRDUDE_FLAGS = -v -p ${MCU} -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT) -b 57600 	#uncomment for arduino nano
 
 #===== Targets =========
 
