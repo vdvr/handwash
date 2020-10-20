@@ -9,7 +9,7 @@ F_CPU = 16000000
 TARGET = main
 SRCS = $(TARGET).c ${EXTRA}
 
-EXTRA = uartNano.c buffer.c
+EXTRA = uartNano.c buffer.c conversion.c
 
 #===== Compile Options ===========
 

@@ -7,4 +7,6 @@ void uartSetup(long baudrate);
 
 void uartPutChar(char data);
 
+void uartPutASCII(int data);
+
 #endif /* UARTNANO_H_ */

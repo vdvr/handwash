@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include "uartNano.h"
+#include "conversion.h"
 
 #include "buffer.h"
 
@@ -16,6 +17,7 @@ void buffer_write(char data)         // fill buffer with uart data, function in 
         buffer_h++;                         // increment head index
         buffer_h &= (BUFFER_SIZE);      // ringbuf wraparound
         buffer_used++;                      // increment bufferspace used
+        // uartPutASCII(buffer_used);       // for debugging
     }
 }
 
@@ -27,5 +29,6 @@ char buffer_read()
     buffer_t++;                         // move tail
     buffer_t &= BUFFER_SIZE;            // tail wraparound
     buffer_used--;                      // decrement bufferused
+    //uartPutChar(ASCIItoChar(data));              // for debugging
     return data;           // succesfully read buffer
 }
