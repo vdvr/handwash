@@ -15,6 +15,6 @@ extern char new_msg;
 
 void pkg_destruct(void);
 
-void pkg_construct(void);
+void pkg_construct(char* cmd, char* arg);
 
 #endif /* PKG_H_ */

@@ -47,6 +47,9 @@ int main(void)
         {   
             // code here for interpreting the new msg
             new_msg = 0;
+
+
+            pkg_construct("123","123");
         }
     }
     

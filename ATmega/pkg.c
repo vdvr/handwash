@@ -18,18 +18,18 @@ void pkg_destruct()
             {
                 char command = buffer_read();
                 commands[i] = command;
-                uartPutChar(command);             // for debugging
+                //uartPutChar(command);             // for debugging
                 if(command==NULL) break;        // null is the seperator
             }
         }
-    uartPutChar('x');
+    //uartPutChar('x');
     for (int i = 0; i < 20; i++)
         {
             if(buffer_used>0)       // buffer not empty
             {
                 char argument = buffer_read();
                 arguments[i] = argument;
-                uartPutChar(argument);             // for debugging
+                //uartPutChar(argument);             // for debugging
                 if((argument==ETX) | (argument == 0)) break;    // ETX is the end of pkg, 0 means empty buffer space (error)
             }
         }
@@ -37,7 +37,21 @@ void pkg_destruct()
     new_msg = 1;
 }
 
-void pkg_construct()
+void pkg_construct(char* cmd, char* arg)        // works, attention to constructors for actual messages (now for serialtools testing)
 {
-    // code hier
+    uartPutChar(STX);
+    for(int i = 0; i<20; i++)
+    {
+        if(*cmd == 0)break;
+        uartPutChar(*cmd);
+        cmd++;
+    }
+    uartPutChar(NULL);
+    for(int i = 0; i<20; i++)
+    {
+        if(*arg == 0)break;
+        uartPutChar(*arg);
+        arg++;
+    }
+    uartPutChar(ETX);
 }
