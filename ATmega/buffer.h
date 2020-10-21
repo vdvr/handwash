@@ -4,7 +4,7 @@
 #include <avr/io.h>
 #include "uartNano.h"
 
-#define BUFFER_SIZE 64          // ringbuffer size must be power of 2 for easy wraparound
+#define BUFFER_SIZE 64         // ringbuffer size must be power of 2 for easy wraparound
 
 extern char buffer[BUFFER_SIZE];
 extern int buffer_t;              // buffer tail index
