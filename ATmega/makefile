@@ -9,7 +9,7 @@ F_CPU = 16000000
 TARGET = main
 SRCS = $(TARGET).c ${EXTRA}
 
-EXTRA = uartNano.c buffer.c conversion.c
+EXTRA = uartNano.c buffer.c conversion.c pkg.c
 
 #===== Compile Options ===========
 
@@ -26,7 +26,7 @@ CFLAGS += -DF_CPU=${F_CPU} -I.
 #AVRDUDE_PORT = usb
 
 AVRDUDE_PROGRAMMER = arduino	#uncomment for arduino nano
-AVRDUDE_PORT = /dev/cu.usbserial-14*
+AVRDUDE_PORT = /dev/cu.wchusbserial14*
 
 #AVRDUDE_FLAGS = -p ${MCU} -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT) -F	#uncomment for ATmega32
 
