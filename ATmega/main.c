@@ -2,51 +2,34 @@
 #include <avr/interrupt.h>
 #include "uartNano.h"
 #include "buffer.h"
+#include "pkg.h"
 
-#define STX 'a'
-#define ETX 'b'
-#define NULL 32
+// ---------------------------------------
+// STX, ETX and NULL are defined in pkg.h
+// ---------------------------------------
 
-char commands[20];
-char arguments[20];
+// Global variables ---------------------
 
-char new_pkg = 0;
-char new_msg = 0;
+// buffer[] char array declared in buffer.h, initialized in buffer.c
+// buffer_t int declared in buffer.h, initialized in buffer.c
+// buffer_h int declared in buffer.h, initialized in buffer.c
+// buffer_used char declared in buffer.h, initialized in buffer.c
 
-char length = 0;
+// commands[] char array declared in pkg.h, initialized in pkg.c
+// arguments[] char array declared in pkg.h, initialized in pkg.c
+// new_pkg char declared in pkg.h, initialized in pkg.c
+// new_msg char declared in pkg.h, initialized in pkg.c
 
-char pkg[40];
+// Global variables end -----------------
 
-ISR (USART_RX_vect)
+
+ISR (USART_RX_vect)             // interrupt for uart receive
 {
-	buffer_write(UDR0);
-    if(UDR0 == ETX) 
+	buffer_write(UDR0);         // write uart data to ringbuffer
+    if(UDR0 == ETX)             // listen for ETX --> extra pkg in ringbufffer
     {
         new_pkg ++;
     }
-}
-
-void pkg_read()
-{
-    while(buffer_used > 0 && buffer_read() != STX);     // zoek achter package in buffer
-    for (int i = 0; i < 20; i++)
-        {
-            if(buffer_used>0)
-            {
-                char command = buffer_read();
-                commands[i] = command;
-                //uartPutChar(command);             // for debugging
-                if(command==NULL) break;
-            }
-        }
-    for (int i = 0; i < 20; i++)
-        {
-            char argument = buffer_read();
-            arguments[i] = argument;
-            if((argument==ETX) | (argument == 0)) break;
-        }
-    new_pkg --;
-    new_msg = 1;
 }
 
 int main(void)
@@ -56,18 +39,13 @@ int main(void)
     for (;;)
     {
         sei();
-        if(new_pkg) pkg_read();
+        if(new_pkg) 
+        {
+            pkg_destruct();
+        }
         if(new_msg)
         {   
-            // uartPutChar('x');
-            // uartPutASCII(length);
-            // for(int i = 0; i<64; i++)
-            // {
-            //     uartPutChar(buffer[i]);
-            // }
-             uartPutChar(commands[0]);          // doet geen print commands
-             uartPutChar(commands[1]);
-             uartPutChar(commands[2]);
+            // code here for interpreting the new msg
             new_msg = 0;
         }
     }
