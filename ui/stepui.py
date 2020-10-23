@@ -83,7 +83,10 @@ class StepUI(QWidget):
 
         # Update UI labels
         durationS = self.currentStep.durationS
-        self.timeLeftLbl.setText(f"{durationS - 1} s")
+        if durationS == None:
+            self.timeLeftLbl.setText("")
+        else:
+            self.timeLeftLbl.setText(f"{durationS - 1} s")
         self.stepNrLbl.setText(f"{currentStepNr} / {self.totalSteps}")
         self.stepDescLbl.setText(self.currentStep.description)
         
@@ -91,9 +94,10 @@ class StepUI(QWidget):
         self.mediaView.setSource(self.currentStep.displayPath)
         
         # Start timer to decrease time left label
-        self.timeLeftTimer = QTimer()
-        self.timeLeftTimer.timeout.connect(self._decreaseDuration)
-        self.timeLeftTimer.start(1000)
+        if durationS != None:
+            self.timeLeftTimer = QTimer()
+            self.timeLeftTimer.timeout.connect(self._decreaseDuration)
+            self.timeLeftTimer.start(1000)
 
         self.stepQueue.pop(0)
 
