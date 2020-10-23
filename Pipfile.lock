@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b5198084a6884fa103963e972ce5f0f611527fc658bc40159b6d079b5456e3ad"
+            "sha256": "cb1dd8562ce65cfc83c58239de4aa4226ffe0e1167dc4c53f157c102bb333871"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -54,6 +54,22 @@
             "markers": "python_version >= '3.5'",
             "version": "==12.8.1"
         },
+        "python-magic": {
+            "hashes": [
+                "sha256:356efa93c8899047d1eb7d3eb91e871ba2f5b1376edbaf4cc305e3c872207355",
+                "sha256:b757db2a5289ea3f1ced9e60f072965243ea43a2221430048fd8cacab17be0ce"
+            ],
+            "index": "pypi",
+            "version": "==0.4.18"
+        },
+        "python-vlc": {
+            "hashes": [
+                "sha256:508bc5b4b4fd72b4e23c926795bdcd38c7c1c08a4dd6b8cc87b0abd1d7118aa1",
+                "sha256:a4d3bdddfce84a8fb1b2d5447193a0239c55c16ca246e5194d48efd59c4e236b"
+            ],
+            "index": "pypi",
+            "version": "==3.0.11115"
+        },
         "pyyaml": {
             "hashes": [
                 "sha256:06a0d7ba600ce0b2d2fe2e78453a470b5a6e000a985dd4a4e54e436cc36b0e97",
@@ -72,5 +88,15 @@
             "version": "==5.3.1"
         }
     },
-    "develop": {}
+    "develop": {
+        "python-magic-bin": {
+            "hashes": [
+                "sha256:34a788c03adde7608028203e2dbb208f1f62225ad91518787ae26d603ae68892",
+                "sha256:7b1743b3dbf16601d6eedf4e7c2c9a637901b0faaf24ad4df4d4527e7d8f66a4",
+                "sha256:90be6206ad31071a36065a2fc169c5afb5e0355cbe6030e87641c6c62edc2b69"
+            ],
+            "index": "pypi",
+            "version": "==0.4.14"
+        }
+    }
 }

@@ -1,4 +1,4 @@
 from .step import Step
-from .datetimewidget import DateTimeWidget
+from .custom import DateTimeWidget, MediaView
 from .stepui import StepUI
 from .idleui import IdleUI

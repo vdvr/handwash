@@ -4,10 +4,13 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+python-magic-bin = "==0.4.14"
 
 [packages]
 pyqt5 = "*"
 pyyaml = "*"
+python-magic = "*"
+python-vlc = "*"
 
 [requires]
 python_version = "3.8"

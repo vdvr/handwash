@@ -1,13 +1,10 @@
-from . import DateTimeWidget
+from . import DateTimeWidget, MediaView
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
-from PyQt5.QtSvg import QGraphicsSvgItem
 from PyQt5.QtWidgets import (
     QWidget,
     QLabel,
     QVBoxLayout,
-    QHBoxLayout, 
-    QGraphicsScene, 
-    QGraphicsView,
+    QHBoxLayout,
 )
 
 
@@ -35,9 +32,9 @@ class StepUI(QWidget):
         # Add layouts, step photo and description to main layout
         self.mainLayout.addLayout(self.topLayout, 2)
 
-        self.photoView = QGraphicsView()
-        self.photoView.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.mainLayout.addWidget(self.photoView, 6)
+        self.mediaView = MediaView()
+        self.mediaView.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.mainLayout.addWidget(self.mediaView, 6)
 
         self.stepDescLbl = QLabel()
         self.stepDescLbl.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
@@ -70,13 +67,14 @@ class StepUI(QWidget):
         self.bottomLayout.addWidget(self.dateTime)
 
         # Start showing steps
-        self._nextStep()
+        self.nextStep()
 
 
-    def _nextStep(self):
+    def nextStep(self):
         # Exit if no steps left
         stepsLeft = len(self.stepQueue)
         if stepsLeft < 1:
+            self.close()
             return
 
         # Calculate steps left and current step nr
@@ -90,11 +88,7 @@ class StepUI(QWidget):
         self.stepDescLbl.setText(self.currentStep.description)
         
         # Update UI image
-        scene = QGraphicsScene()
-        photoItem = QGraphicsSvgItem(self.currentStep.image)
-        photoItem.setScale(4)
-        scene.addItem(photoItem)
-        self.photoView.setScene(scene)
+        self.mediaView.setSource(self.currentStep.displayPath)
         
         # Start timer to decrease time left label
         self.timeLeftTimer = QTimer()
@@ -111,7 +105,7 @@ class StepUI(QWidget):
 
         if durationS <= 0:
             self.timeLeftTimer.stop()
-            self._nextStep()
+            self.nextStep()
 
         else:
             self.timeLeftLbl.setText(f"{durationS - 1} s")
