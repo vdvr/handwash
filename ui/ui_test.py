@@ -3,12 +3,21 @@ import locale
 import yaml
 import glob
 from PyQt5.QtWidgets import QApplication
+from gpiozero import LED
+from time import sleep
+
 from . import (
     Step, 
     StepUI,
     IdleUI,
 )
 from PyQt5.QtGui import QFontDatabase
+
+tap_signal = Button(17)
+
+while True:
+    
+    tap_signal.when_pressed = start_handwash()
 
 
 if __name__ == "__main__":
