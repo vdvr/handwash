@@ -26,7 +26,7 @@ int main() {
         system("sudo stty -F /dev/arduino -hupcl");
 
         int fd = serialOpen("/dev/arduino", BAUDRATE);
-        system("chmod a+rw /dev/ttyACM0");
+        system("chmod a+rw /dev/arduino");
 
         serialFlush(fd);
 
