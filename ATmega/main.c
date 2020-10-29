@@ -1,6 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "uartNano.h"
+#include "uart.h"
 #include "buffer.h"
 #include "pkg.h"
 
@@ -25,32 +25,32 @@
 
 ISR (USART_RX_vect)             // interrupt for uart receive
 {
-	buffer_write(UDR0);         // write uart data to ringbuffer
-    if(UDR0 == ETX)             // listen for ETX --> extra pkg in ringbufffer
-    {
-        new_pkg ++;
-    }
+	buffer_write(_USART_UDRE);         // write uart data to ringbuffer
+	if(_USART_UDRE == ETX)             // listen for ETX --> extra pkg in ringbufffer
+	{
+		new_pkg ++;
+	}
 }
 
 int main(void)
 {
-    uartSetup(57600);
+	uartSetup(57600);
 
-    for (;;)
-    {
-        sei();
-        if(new_pkg) 
-        {
-            pkg_destruct();
-        }
-        if(new_msg)
-        {   
-            // code here for interpreting the new msg
-            new_msg = 0;
+	for (;;)
+	{
+		sei();
+		if(new_pkg) 
+		{
+			pkg_destruct();
+		}
+		if(new_msg)
+		{   
+			// code here for interpreting the new msg
+			new_msg = 0;
 
 
-            pkg_construct("123","123");
-        }
-    }
-    
+			pkg_construct("123","123");
+		}
+	}
+
 }

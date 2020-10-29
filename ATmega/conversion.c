@@ -1,5 +1,5 @@
 #include <avr/io.h>
-#include "uartNano.h"
+#include "uart.h"
 #include "conversion.h"
 
 char ASCIItoChar (char ASCII)
