@@ -3,6 +3,8 @@
 #include "uart.h"
 #include "buffer.h"
 #include "pkg.h"
+#include "msg.h"
+#include "peripheral.h"
 
 // ---------------------------------------
 // STX, ETX and NULL are defined in pkg.h
@@ -25,6 +27,8 @@
 
 ISR (USART_RX_vect)             // interrupt for uart receive
 {
+	rpi_avail = 1;
+
 	buffer_write(_USART_UDRE);         // write uart data to ringbuffer
 	if(_USART_UDRE == ETX)             // listen for ETX --> extra pkg in ringbufffer
 	{
@@ -34,23 +38,27 @@ ISR (USART_RX_vect)             // interrupt for uart receive
 
 int main(void)
 {
+	sei();
 	uartSetup(57600);
 
 	for (;;)
 	{
-		sei();
-		if(new_pkg) 
+		if (is_faucet_sensor_set())			// checks if object detected at faucet sensor, copy body for external interrupt
 		{
-			pkg_destruct();
-		}
-		if(new_msg)
-		{   
-			// code here for interpreting the new msg
-			new_msg = 0;
+			if (!rpi_avail) 
+			{
+				faucet_on_while_sensor_set();
+				continue;
+			}
 
+			send_msg(REQUEST_WATER, "");
 
-			pkg_construct("123","123");
+			if (wait_perm_msg(500))
+			{
+				faucet_on_while_sensor_set_with_timeout(2000);
+
+				send_msg(WATER_DONE, "");
+			}
 		}
 	}
-
 }
