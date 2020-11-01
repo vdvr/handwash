@@ -1,41 +1,43 @@
 steps:
   - Nat maken:
-      description: "Maak je handen nat"
-      durationS: 10
+      description: Maak je handen nat
       displayPath: res/videos/who_1_wet.mp4
+      water: True
   - Inzepen:
-      description: "Neem zeep uit de zeepdispenser"
-      durationS: 10
+      description: Neem zeep uit de zeepdispenser
       displayPath: res/videos/who_2_soap.mp4
+      soap: True
   - Handpalmen:
-      description: "Wrijf de handpalmen tegen elkaar"
+      description: Wrijf de handpalmen tegen elkaar
       durationS: 15
       displayPath: res/videos/who_3_rub.mp4
   - Gekruist rug:
-      description: "Wrijf de rechterhandpalm met gekruiste vingers over de linkerhandrug en andersom"
+      description: Wrijf de rechterhandpalm met gekruiste vingers over de linkerhandrug en andersom
       durationS: 20
       displayPath: res/videos/who_4_dorsal.mp4
   - Gekruist palm:
-      description: "Wrijf de handpalmen met gekruiste vingers tegen elkaar"
+      description: Wrijf de handpalmen met gekruiste vingers tegen elkaar
       durationS: 20
       displayPath: res/videos/who_5_cross.mp4
   - Vingers vuist: 
-      description: "Wrijf je vingers in de vuist van de andere hand"
+      description: Wrijf je vingers in de vuist van de andere hand
       durationS: 20
       displayPath: res/videos/who_6_fingers.mp4
   - Duim:
-      description: "Maak cirkels met je rechterduim in je linkerhand en andersom"
+      description: Maak cirkels met je rechterduim in je linkerhand en andersom
       durationS: 20
       displayPath: res/videos/who_7_thumbs.mp4
   - Palm vingertop:
-      description: "Maak cirkels met je vingertoppen in je handpalmen"
+      description: Maak cirkels met je vingertoppen in je handpalmen
       durationS: 20
       displayPath: res/videos/who_8_palm.mp4
   - Spoelen:
-      description: "Spoel de zeep van je handen"
-      durationS: 15
+      description: Spoel de zeep van je handen
       displayPath: res/videos/who_9_rinse.mp4
+      water: True
   - Drogen:
-      description: "Droog je handen met een wegwerpdoekje of handdroger"
+      description: Droog je handen met een wegwerpdoekje of handdroger
       durationS: 15
       displayPath: res/videos/who_10_dry.mp4
+
+startText: Neem water om te beginnen...

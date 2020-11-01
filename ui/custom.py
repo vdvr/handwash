@@ -27,10 +27,6 @@ class MediaView(QGraphicsView):
 
         self.instance = vlc.Instance("--input-repeat=999999")
         self.mediaplayer = self.instance.media_player_new()
-        #self.mediaplayer.set_playback_mode(vlc.PlaybackMode.loop) 
-
-        #self.videoPlayer = QMediaPlayer()
-        #self.videoPlayer.setMuted(True)
 
 
     def setSource(self, filePath):
@@ -59,14 +55,6 @@ class MediaView(QGraphicsView):
             
             self.mediaplayer.play()
             return
-
-            #self.playlist = QMediaPlaylist()
-            #self.playlist.addMedia(QMediaContent(QUrl.fromLocalFile(filePath)))
-            #self.playlist.setPlaybackMode(QMediaPlaylist.Loop)
-
-            #self.videoPlayer.setVideoOutput(mediaItem)
-            #self.videoPlayer.setPlaylist(self.playlist)
-            #self.videoPlayer.play()
 
         else:
             mediaItem = QGraphicsItem()

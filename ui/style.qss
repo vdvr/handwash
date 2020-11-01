@@ -50,3 +50,7 @@ QLabel#timebig {
     font: 80pt Roboto;
     font-weight: 700;
 }
+
+QLabel#starttext {
+    font-weight: 400;
+}

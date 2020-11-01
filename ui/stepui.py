@@ -1,5 +1,10 @@
 from . import DateTimeWidget, MediaView
-from PyQt5.QtCore import Qt, pyqtSlot, QTimer
+from PyQt5.QtCore import (
+    Qt, 
+    pyqtSignal,
+    pyqtSlot,
+    QTimer,
+)
 from PyQt5.QtWidgets import (
     QWidget,
     QLabel,
@@ -10,7 +15,9 @@ from PyQt5.QtWidgets import (
 
 
 class StepUI(QWidget):
-    def __init__(self, steps=None, styleFile=None):
+    finished = pyqtSignal()
+
+    def __init__(self, steps, styleFile=None):
         super().__init__()
         
         # Initialize properties
@@ -74,15 +81,16 @@ class StepUI(QWidget):
         # Exit if no steps left
         stepsLeft = len(self.stepQueue)
         if stepsLeft < 1:
-            self.close()
+            self.finished.emit()
             return
 
         # Calculate steps left and current step nr
         self.currentStep = self.stepQueue[0]
+        self.stepDuration = self.currentStep.durationS
         currentStepNr = self.totalSteps - stepsLeft + 1
 
         # Update UI labels
-        durationS = self.currentStep.durationS
+        durationS = self.stepDuration
         if durationS == None:
             self.timeLeftLbl.setText("")
         else:
@@ -104,8 +112,8 @@ class StepUI(QWidget):
 
     @pyqtSlot()
     def _decreaseDuration(self):
-        self.currentStep.durationS -= 1
-        durationS = int(self.currentStep.durationS)
+        self.stepDuration -= 1
+        durationS = self.stepDuration
 
         if durationS <= 0:
             self.timeLeftTimer.stop()
