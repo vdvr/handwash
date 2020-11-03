@@ -1,60 +1,43 @@
-#===== Main Options ===========
+m32 = atmega32
+m32_F = 8000000
 
-#MCU = atmega32		#uncomment for ATmega32
-#F_CPU = 8000000
-
-MCU = atmega328p	#uncomment for arduino nano
-F_CPU = 16000000
+nano = atmega328p
+nano_F = 16000000
 
 TARGET = main
 SRCS = $(TARGET).c ${EXTRA}
 
-EXTRA = uartNano.c buffer.c conversion.c pkg.c board.c timer2min.c
-
-#===== Compile Options ===========
+EXTRA = uart.c buffer.c conversion.c pkg.c
 
 CFLAGS = -std=c99
 CFLAGS += -Wall
 CFLAGS += -g
 CFLAGS += -Os
-CFLAGS += -mmcu=${MCU}
-CFLAGS += -DF_CPU=${F_CPU} -I.
+CFLAGS += -Wno-misspelled-isr
 
-#===== Programming Options =========
-
-#AVRDUDE_PROGRAMMER = usbasp	#uncomment for ATmega32
-#AVRDUDE_PORT = usb
-
-AVRDUDE_PROGRAMMER = arduino	#uncomment for arduino nano
-AVRDUDE_PORT = /dev/cu.wchusbserial*
-
-#AVRDUDE_FLAGS = -p ${MCU} -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT) -F	#uncomment for ATmega32
-
-AVRDUDE_FLAGS = -v -p ${MCU} -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT) -b 57600 	#uncomment for arduino nano
-
-#===== Targets =========
+m32_flags = -p ${m32} -c usbasp -P usb -F
+nano_flags = -v -p ${nano} -c arduino -P /dev/cu.wchusbserial14 -b 57600
 
 CC = avr-gcc
 OBJCOPY = avr-objcopy
 AVRDUDE = avrdude
-
 AVRDUDE_WRITE_FLASH = -U flash:w:${TARGET}.hex:i
 
-
-all:
-	${CC} ${CFLAGS} -o ${TARGET}.bin ${SRCS}
+compile-nano:
+	${CC} ${CFLAGS} -D __UART328p -mmcu=atmega328p -DF_CPU=16000000 -I. -o ${TARGET}.bin ${SRCS}
+compile-m32:
+	${CC} ${CFLAGS} -D __UART32 -mmcu=atmega32 -DF_CPU=8000000 -I. -o ${TARGET}.bin ${SRCS}
+objcpy:
 	${OBJCOPY} -j .text -j .data -O ihex ${TARGET}.bin ${TARGET}.hex
-
-flash:
-	${AVRDUDE} ${AVRDUDE_FLAGS} ${AVRDUDE_WRITE_FLASH}
-
+m32:
+	make clean
+	make compile-m32
+	make objcpy
+	${AVRDUDE} ${m32_flags} ${AVRDUDE_WRITE_FLASH}
+nano:
+	make clean
+	make compile-nano
+	make objcpy
+	${AVRDUDE} ${nano_flags} ${AVRDUDE_WRITE_FLASH}
 clean:
 	rm -f *bin *hex
-
-
-help:
-	@echo 'Basic targets:'
-	@echo '  clean       Remove files created by make.'
-	@echo
-	@echo 'Flashing:'
-	@echo '  flash       Write only flash.'
