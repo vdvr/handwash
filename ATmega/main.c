@@ -10,7 +10,7 @@
 #include "peripheral.h"
 
 // ---------------------------------------
-// STX, ETX and NULL are defined in pkg.h
+// STX, ETX and SEP are defined in pkg.h
 // ---------------------------------------
 
 // Global variables ---------------------
@@ -64,7 +64,7 @@ int main(void)
 	{
 		if (is_faucet_sensor_set())			// checks if object detected at faucet sensor, copy body for external interrupt
 		{
-			if (!rpi_avail) 
+			if (!rpi_avail)
 			{
 				faucet_on_while_sensor_set();
 				continue;
