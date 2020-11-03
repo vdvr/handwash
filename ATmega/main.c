@@ -1,8 +1,10 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "board.h"
 #include "uartNano.h"
 #include "buffer.h"
 #include "pkg.h"
+#include "timer2min.h"
 
 // ---------------------------------------
 // STX, ETX and NULL are defined in pkg.h
@@ -23,34 +25,55 @@
 // Global variables end -----------------
 
 
-ISR (USART_RX_vect)             // interrupt for uart receive
+// ISR (USART_RX_vect)             // interrupt for uart receive
+// {
+// 	buffer_write(UDR0);         // write uart data to ringbuffer
+//     if(UDR0 == ETX)             // listen for ETX --> extra pkg in ringbufffer
+//     {
+//         new_pkg ++;
+//     }
+// }
+
+ISR(INT0_vect)
 {
-	buffer_write(UDR0);         // write uart data to ringbuffer
-    if(UDR0 == ETX)             // listen for ETX --> extra pkg in ringbufffer
-    {
-        new_pkg ++;
-    }
+    //pkg_construct("water","123");
+    resetTimer();
+    startTimer();
+}
+
+// ISR(INT1_vect)
+// {
+//     pkg_construct("zeep","123");
+// }
+
+ISR(TIMER1_COMPA_vect)
+{
+    toggleSoap();
+    stopTimer();
 }
 
 int main(void)
 {
-    uartSetup(57600);
+    boardSetup();               // configures port D for specific use on prototype board
+                                // also enables INT0 en INT1
+    secTimerSetup();
+    //uartSetup(57600);
 
+    sei();
     for (;;)
     {
-        sei();
-        if(new_pkg) 
-        {
-            pkg_destruct();
-        }
-        if(new_msg)
-        {   
-            // code here for interpreting the new msg
-            new_msg = 0;
+        // if(new_pkg) 
+        // {
+        //     pkg_destruct();
+        // }
+        // if(new_msg)
+        // {   
+        //     // code here for interpreting the new msg
+        //     new_msg = 0;
 
 
-            pkg_construct("123","123");
-        }
+        //     pkg_construct("123","123");
+        // }
     }
     
 }
