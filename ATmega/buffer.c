@@ -1,7 +1,6 @@
 #include <avr/io.h>
 #include "uart.h"
 #include "conversion.h"
-
 #include "buffer.h"
 
 char buffer[BUFFER_SIZE];
