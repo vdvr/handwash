@@ -1,18 +1,14 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
-<<<<<<< HEAD
+
 #include "board.h"
-#include "uartNano.h"
 #include "buffer.h"
 #include "pkg.h"
 #include "timer2min.h"
 =======
 #include "uart.h"
-#include "buffer.h"
-#include "pkg.h"
 #include "msg.h"
 #include "peripheral.h"
->>>>>>> 37a9cca1fb1efec95f40e5f90ae3500fb9913219
 
 // ---------------------------------------
 // STX, ETX and NULL are defined in pkg.h
@@ -36,11 +32,12 @@
 ISR (USART_RX_vect)             // interrupt for uart receive
 {
 	rpi_avail = 1;
-	buffer_write(UDR0);         // write uart data to ringbuffer
-    if(UDR0 == ETX)             // listen for ETX --> extra pkg in ringbufffer
-    {
-        new_pkg ++;
-    }
+
+	buffer_write(_USART_UDRE);         // write uart data to ringbuffer
+	if(_USART_UDRE == ETX)             // listen for ETX --> extra pkg in ringbufffer
+	{
+		new_pkg ++;
+	}
 }
 
 ISR(INT0_vect)
