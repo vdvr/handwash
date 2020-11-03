@@ -7,7 +7,7 @@ nano_F = 16000000
 TARGET = main
 SRCS = $(TARGET).c ${EXTRA}
 
-EXTRA = uart.c buffer.c conversion.c pkg.c
+EXTRA = uart.c buffer.c conversion.c pkg.c board.c msg.c peripheral.c timer2min.c
 
 CFLAGS = -std=c99
 CFLAGS += -Wall
