@@ -3,7 +3,7 @@
 
 extern char seconds;
 
-void secTimerSetup(void);
+void timerSetup(void);
 
 void stopTimer(void);
 

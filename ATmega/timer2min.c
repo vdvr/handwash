@@ -3,7 +3,7 @@
 
 char seconds = 0;
 
-void secTimerSetup(void)
+void timerSetup(void)
 {
     TCCR1A = 0;
     OCR1A = 31249;                      // compare value for 1Hz
@@ -11,17 +11,17 @@ void secTimerSetup(void)
     //TCCR1B |= (1<<CS12);              // by connecting prescaler timer starts to count
 }
 
-void stopTimer(void)
+void stopTimer(void)                    // worden niet gebruikt
 {
     TCCR1B &= ~(1<<CS12);
 }
 
-void startTimer(void)
+void startTimer(void)                   // word enkel na setup gebruikt
 {
     TCCR1B |= (1<<CS12);
 }
 
-void resetTimer(void)
+void resetTimer(void)                   // worden niet gebruikt
 {
     TCNT1 = 0;
 }
