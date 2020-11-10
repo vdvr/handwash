@@ -1,6 +1,8 @@
 #include <avr/io.h>
 #include "timer2min.h"
 
+char seconds = 0;
+
 void secTimerSetup(void)
 {
     TCCR1A = 0;

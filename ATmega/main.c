@@ -51,8 +51,7 @@ ISR(INT0_vect)
 
 // ISR(TIMER1_COMPA_vect)
 // {
-//     toggleSoap();
-//     stopTimer();
+//     seconds++;
 // }
 
 int main(void)

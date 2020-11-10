@@ -1,0 +1,33 @@
+int poll_RPI(void)
+{
+    if (seconds >= 120)
+	{
+		seconds = 0;
+		send_messag();      // poll cmd
+	}
+}
+
+int wait_rec_msg(int cmd)
+{
+    seconds = 0;
+    while(!new_message && seconds < 1)
+
+    if (new_msg) 
+    {
+        pkg_destruct();
+        new_msg = 0;
+
+        switch (command[0])
+        {
+            case ACK:
+                return 1;
+            case NACK:
+                return 0;
+            default:
+                continue;
+        }
+    }
+
+    rpi_avail = 0;
+    return 0;
+}
