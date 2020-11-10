@@ -1,6 +1,8 @@
 #ifndef PERIPHERAL_H_
 #define PERIPHERAL_H_
 
+#define true 1
+
 // faucet
 #define F_DDR DDRB
 #define F_PORT PORTB
