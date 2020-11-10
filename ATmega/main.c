@@ -39,25 +39,27 @@ ISR (USART_RX_vect)             // interrupt for uart receive
 	}
 }
 
-ISR(INT0_vect)
-{
-    //pkg_construct("water","123");
-}
+// ISR(INT0_vect)
+// {
+//     pkg_construct("water","123");
+// }
 
 // ISR(INT1_vect)
 // {
 //     pkg_construct("zeep","123");
 // }
 
-// ISR(TIMER1_COMPA_vect)
-// {
-//     seconds++;
-// }
+ISR(TIMER1_COMPA_vect)
+{
+    seconds++;
+}
 
 int main(void)
 {
 	sei();
 	uartSetup(57600);
+	timerSetup();
+	//startTimer();
 
 	for (;;)
 	{
