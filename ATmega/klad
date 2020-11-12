@@ -9,7 +9,7 @@ void poll_RPI(void)
             resetTimer();                       // wait_rec_msg gebruikt timestamps
             poll_reset();                       // voor volgende poll, voor als de poll faalde
             send_msg(POLL_REQUEST,"");
-            wait_rec_msg(500);
+            if (wait_rec_msg(500)) rpi_avail = 1;
         }
     }
 }
