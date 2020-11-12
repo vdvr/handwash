@@ -16,7 +16,7 @@ CFLAGS += -Os
 CFLAGS += -Wno-misspelled-isr
 
 m32_flags = -p ${m32} -c usbasp -P usb -F
-nano_flags = -v -p ${nano} -c arduino -P /dev/cu.wchusbserial14 -b 57600
+nano_flags = -v -p ${nano} -c arduino -P /dev/arduino
 
 CC = avr-gcc
 OBJCOPY = avr-objcopy

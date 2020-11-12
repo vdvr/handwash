@@ -1,13 +1,13 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "board.h"
-#include "buffer.h"
-#include "pkg.h"
+//#include "board.h"
+//#include "buffer.h"
+//#include "pkg.h"
 #include "timer2min.h"
 #include "uart.h"
-#include "msg.h"
-#include "peripheral.h"
+//#include "msg.h"
+//#include "peripheral.h"
 
 // ---------------------------------------
 // STX, ETX and SEP are defined in pkg.h
@@ -25,9 +25,12 @@
 // new_pkg char declared in pkg.h, initialized in pkg.c
 // new_msg char declared in pkg.h, initialized in pkg.c
 
+// seconds_now declared in timer2min.h, initialized in timer2min.c
+//unsigned int seconds_now;
+
 // Global variables end -----------------
 
-
+/*
 ISR (USART_RX_vect)             // interrupt for uart receive
 {
 	rpi_avail = 1;
@@ -37,7 +40,7 @@ ISR (USART_RX_vect)             // interrupt for uart receive
 	{
 		new_pkg ++;
 	}
-}
+}*/
 
 // ISR(INT0_vect)
 // {
@@ -51,9 +54,9 @@ ISR (USART_RX_vect)             // interrupt for uart receive
 
 ISR(TIMER1_COMPA_vect)
 {
-    seconds++;
+    seconds_now++;
 }
-
+/*
 int main(void)
 {
 	sei();
@@ -80,5 +83,29 @@ int main(void)
 				send_msg(WATER_DONE, "");
 			}
 		}
+	}
+}
+*/
+
+int main(void)
+{
+	uartSetup(9600);
+	timerSetup();
+	startTimer();
+	sei();
+	struct timestamp time = getTime();
+	for (int i = 0; i < 100; i++) 
+	{
+		uartPutASCII(seconds_now);
+		uartPutChar('-');
+		uartPutASCII(TCNT1);
+		uartPutChar('-');
+		uartPutASCII(time.seconds);
+		uartPutChar('-');
+		uartPutASCII(time.extra);
+		uartPutChar('-');
+		while(!checkTimeElapsed(time, i, 0));
+		uartPutASCII(i);
+		uartPutChar('\n');
 	}
 }

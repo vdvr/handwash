@@ -18,8 +18,8 @@ void startTimer(void);
 
 void resetTimer(void);
 
-void getTime(struct timestamp *time_out);
+struct timestamp getTime();
 
-int checkTimeElapsed(struct timestamp *time, unsigned int seconds, unsigned int extra);
+int checkTimeElapsed(struct timestamp time, unsigned int seconds, unsigned int extra);
 
 #endif /* TIMER2MIN_H_ */

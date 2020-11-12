@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include "peripheral.h"
+#include "timer2min.h"
 
 
 void peripheral_setup(void)
@@ -25,9 +26,13 @@ void faucet_off(void)
     F_PORT &= ~(1 << F_PIN);
 }
 
+// sets faucet on, stays on aslong as faucet_sensor detects
+// and until sensor doesnt detect for 2 seconds, then faucet off and exiting
 void faucet_on_while_sensor_set(void)
 {
     int is_on_again = 0;
+    struct timestamp start_time;
+
     faucet_on();
 
     while (true) 
@@ -35,8 +40,8 @@ void faucet_on_while_sensor_set(void)
         is_on_again = 0;
         while (is_faucet_sensor_set());
 
-        int start_time = TCNT1;
-        while (TCNT1 - start_time < 2000)  // no check if timer overflow occurs
+        start_time = getTime();
+        while (!checkTimeElapsed(start_time, 2, 0))
         {
             if (is_faucet_sensor_set()) {
                 is_on_again = 1;
@@ -51,8 +56,15 @@ void faucet_on_while_sensor_set(void)
     }
 }
 
+// sets faucet on, stays on aslong as faucet_sensor detects
+// and until sensor doesnt detect for 2 seconds, then faucet off
+// finally timeout will decide how long sensor has time to detect again and repeat cycle
+// if no detection in timout span, function exited
 void faucet_on_while_sensor_set_with_timeout(int timeout)
 {
+    struct timestamp start_time;
+    unsigned int timeout_s = timeout / 1000;
+    unsigned int timout_e = (timeout % 1000) * TIMER_OF_1HZ / 1000; // convert ms to extra
     int is_on_again = 0;
 
     while (true) 
@@ -62,8 +74,9 @@ void faucet_on_while_sensor_set_with_timeout(int timeout)
         is_on_again = 0;
         while (is_faucet_sensor_set());
 
-        int start_time = TCNT1;
-        while (TCNT1 - start_time < 2000)  // no check if timer overflow occurs
+        // keep faucet until nothing detected for 2 seconds
+        start_time = getTime();
+        while (!checkTimeElapsed(start_time, 2, 0))
         {
             if (is_faucet_sensor_set()) {
                 is_on_again = 1;
@@ -74,8 +87,8 @@ void faucet_on_while_sensor_set_with_timeout(int timeout)
         if (is_on_again) continue;
         else faucet_off();
 
-        start_time = TCNT1;
-        while (TCNT1 - start_time < timeout)  // no check if timer overflow occurs
+        start_time = getTime();
+        while (!checkTimeElapsed(start_time, timeout_s, timout_e))
         {
             if (is_faucet_sensor_set()) {
                 is_on_again = 1;

@@ -17,7 +17,8 @@
 #define _USART_UCSRA UCSR0A
 #define _USART_UCSRB UCSR0B
 #define _USART_UCSRC UCSR0C
-#define _USART_UDRE UDR0
+#define _USART_UDR0 UDR0
+#define _USART_UDRE UDRE0
 #define _USART_UCSZ0 UCSZ00
 #define _TXEN TXEN0
 #define _RXEN RXEN0
@@ -31,6 +32,6 @@
 
 void uartSetup(long baudrate);
 void uartPutChar(char data);
-void uartPutASCII(int data);
+void uartPutASCII(unsigned int data);
 
 #endif /* UARTNANO_H_ */
