@@ -1,62 +1,18 @@
-timer loopt altijd, als er geen actie is zal deze optellen tot 120 seconden en pollen
-elke keer als de timer gebruikt word voor overige functies wordt deze gereset, zo zal men niet proberen te verbinden als we in het process zitten
+pollSec moet opgeteld worden in timer interrupt
 
-int poll_RPI(void)
+void poll_RPI(void)
 {
-    if (seconds >= 120)
-	{
-		seconds = 0;
-		send_messag();      // poll cmd
-	}
-}
-
-int wait_rec_msg(int cmd)
-{
-    seconds = 0;
-    while(!new_message && seconds < 1);
-
-    if (new_msg) 
+    if(!rpi_avail)
     {
-        pkg_destruct();
-        new_msg = 0;
-
-        switch (command[0])
+        if(pollSec >= 120)
         {
-            case ACK:
-                return 1;
-            case NACK:
-                return 0;
-            default:
-                continue;
+            send_msg(POLL_REQUEST,"");
         }
     }
-
-    rpi_avail = 0;
-    return 0;
 }
 
-void faucet_on_while_sensor_set(void)
+void poll_reset(void)           // deze functie oproepen bij elke actie bij atmega
 {
-    int is_on_again = 0;
-    faucet_on();
-
-    while (true) 
-    {
-        is_on_again = 0;
-        while (is_faucet_sensor_set());
-
-        seconds = 0;
-        while (seconds < 2)
-        {
-            if (is_faucet_sensor_set()) {
-                is_on_again = 1;
-                break;
-            }
-        }
-
-        if (is_on_again) continue;
-
-        faucet_off();
-        return;   
-    }
+    pollSec = 0;
 }
+
