@@ -72,7 +72,7 @@ int main() {
                                         strcat(msg_to_send, "|");
                                         strcat(msg_to_send, tx_msg.pkg.arguments);
                                         zmq_send(requester, msg_to_send, msglen, 0);
-                                        // send_msg(queue, tx_msg);
+                                        printf(msg_to_send);
                                 }
                                 busy = 0;
                                 rxpt = &rx_buffer[0];
