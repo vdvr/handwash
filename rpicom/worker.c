@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+#include <zmq.h>
 
 #include "helper.h"
 #include "pkghandler.h"
@@ -35,6 +36,11 @@ int main() {
         int num;
         char c;
 
+        /* zmq */
+        void *context = zmq_ctx_new ();
+        void *requester = zmq_socket (context, ZMQ_REQ);
+        zmq_connect (requester, "tcp://localhost:5557");
+        int request_nbr;
         while (1) {
                 int result = rcv_msg(queue, rx_msg, 1);
                 if (result != -1) {
@@ -59,8 +65,15 @@ int main() {
                                 if (deserialize(rx_buffer, &tx_msg.pkg) != -1) {
                                         queue = create_queue(key);
                                         tx_msg.type = 2;
-                                        printf("Got message with command: %s and arguments: %s", tx_msg.pkg.command, tx_msg.pkg.arguments);
-                                        send_msg(queue, tx_msg);
+                                        printf("[worker] cmd: %s\n", tx_msg.pkg.command);
+                                        printf("[worker] args: %s\n", tx_msg.pkg.arguments);
+                                        int msglen = strlen(tx_msg.pkg.command)+strlen(tx_msg.pkg.arguments)+1;
+                                        char msg_to_send[msglen];
+                                        strcat(msg_to_send, tx_msg.pkg.command);
+                                        strcat(msg_to_send, "|");
+                                        strcat(msg_to_send, tx_msg.pkg.arguments);
+                                        zmq_send(requester, msg_to_send, msglen, 0);
+                                        // send_msg(queue, tx_msg);
                                 }
                                 busy = 0;
                                 rxpt = &rx_buffer[0];

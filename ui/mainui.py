@@ -1,10 +1,18 @@
 from . import StepUI, IdleUI
 import enum
+import zmq
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 from PyQt5.QtWidgets import (
     QMainWindow
 )
-import serial
+
+
+context = zmq.Context()
+send_socket = context.socket(zmq.PUSH)
+send_socket.connect('tcp://127.0.0.1:5557')
+recv_socket = context.socket(zmq.PULL)
+recv_socket.connect('tcp://127.0.0.1:5556')
+
 
 class Cmd(enum.Enum):
     ACK = 1
@@ -13,7 +21,6 @@ class Cmd(enum.Enum):
     REQ_SOAP = 4
     WATER_DONE = 5
     SOAP_DONE = 6
-    
 
 
 class MainUI(QMainWindow):
@@ -90,13 +97,20 @@ class MainUI(QMainWindow):
 
 
     def sendMsg(self, cmd, args):
-        payload = f"{cmd.value}{args}\n".encode("ascii")
-        self.com.write(payload)
-
+        send_msg = cmd + '|' + args
+        send_socket.send_string(send_msg)
 
     def getMsg(self):
-        payload = self.com.readline()
+        payload = recv_socket.recv_string()
         if payload:
-            msg = payload.decode("ascii")
-            cmd = Cmd(int(msg[0]))
-            return {"cmd": cmd, "args": msg[:-1]}
+            payload = payload.split('|')
+            if (payload[0] == "water"):
+                if (payload[1] == "request;"):
+                    return {"cmd": Cmd["REQ_WATER"], "args": payload[1]}
+                elif (payload[1] == "done;"):
+                    return {"cmd": Cmd["WATER_DONE"], "args": payload[1]}
+            elif (payload[0] == "soap"):
+                if (payload[1] == "request;"):
+                    return {"cmd": Cmd["REQ_SOAP"], "args": payload[1]}
+                elif (payload[1] == "done;"):
+                    return {"cmd": Cmd["SOAP_DONE"], "args": payload[1]}
