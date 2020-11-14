@@ -54,6 +54,9 @@ ISR(TIMER1_COMPA_vect)
 int main(void)
 {
 	sei();
+
+	debug_port_setup();
+
 	peripheral_setup();
 	uartSetup(9600);
 	timerSetup();
@@ -65,6 +68,10 @@ int main(void)
 
 	for (;;)
 	{
+
+		if(debug_port_read(0)) pkg_construct("water","");
+
+
 		if (is_faucet_sensor_set())			// checks if object detected at faucet sensor, copy body for external interrupt
 		{
 			//debug_sendString("faucet detected");
