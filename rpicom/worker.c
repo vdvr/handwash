@@ -40,7 +40,6 @@ int main() {
         void *context = zmq_ctx_new ();
         void *requester = zmq_socket (context, ZMQ_REQ);
         zmq_connect (requester, "tcp://localhost:5557");
-        int request_nbr;
         while (1) {
                 int result = rcv_msg(queue, rx_msg, 1);
                 if (result != -1) {
@@ -78,7 +77,9 @@ int main() {
                                 busy = 0;
                                 rxpt = &rx_buffer[0];
                         }
-                } else usleep(200);
+                } else usleep(20);
         }
+        zmq_close(requester);
+        zmq_ctx_destroy(context);
         close(fd);
 };
