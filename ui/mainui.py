@@ -17,10 +17,10 @@ class Cmd(enum.Enum):
 
 
 class MainUI(QMainWindow):
-    def __init__(self, steps, startTxt=None, styleFile=None):
+    def __init__(self, device, steps, startTxt=None, styleFile=None):
         super().__init__()
 
-        self.com = serial.Serial("COM8", 9600, timeout=0)
+        self.com = serial.Serial(device, 9600, timeout=0)
 
         if styleFile != None:
             with open(styleFile) as styleFileObj:

@@ -28,7 +28,9 @@ app = QApplication(sys.argv)
 for filepath in glob.iglob("fonts/*/*.ttf"):
     QFontDatabase.addApplicationFont(filepath)
 
-mainUI = MainUI(steps, startTxt=yConfig["startText"], styleFile="ui/style.qss")
+dev = "/dev/arduino" if len(sys.argv) == 1 else sys.argv[1]
+
+mainUI = MainUI(dev, steps, startTxt=yConfig["startText"], styleFile="ui/style.qss")
 mainUI.show()
 
 sys.exit(app.exec_())
