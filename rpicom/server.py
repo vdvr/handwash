@@ -23,8 +23,8 @@ def print_incoming_messages():
         msg = msg.split('|')
         msg_cmd = msg[0]
         msg_args = msg[1]
-        print(f'[server.py] cmd from worker: {msg_cmd}')
-        print(f'[server.py] args from worker: {msg_args}')
+        print(f'\n[server.py] cmd from worker: {msg_cmd}\n')
+        print(f'\n[server.py] args from worker: {msg_args}\n')
 
         handler(msg_cmd, msg_args)
 

@@ -64,15 +64,14 @@ int main() {
                                 if (deserialize(rx_buffer, &tx_msg.pkg) != -1) {
                                         queue = create_queue(key);
                                         tx_msg.type = 2;
-                                        printf("[worker] cmd: %s\n", tx_msg.pkg.command);
-                                        printf("[worker] args: %s\n", tx_msg.pkg.arguments);
+                                        printf("\n[worker] cmd: %s\n", tx_msg.pkg.command);
+                                        printf("\n[worker] args: %s\n", tx_msg.pkg.arguments);
                                         int msglen = strlen(tx_msg.pkg.command)+strlen(tx_msg.pkg.arguments)+1;
                                         char msg_to_send[msglen];
                                         strcat(msg_to_send, tx_msg.pkg.command);
                                         strcat(msg_to_send, "|");
                                         strcat(msg_to_send, tx_msg.pkg.arguments);
                                         zmq_send(requester, msg_to_send, msglen, 0);
-                                        printf(msg_to_send);
                                 }
                                 busy = 0;
                                 rxpt = &rx_buffer[0];
