@@ -14,7 +14,7 @@ msgReader.o: msgReader.c msg.h helper.h pkg.h
 	gcc -g -Wall -Wextra -c msgReader.c
 
 worker: worker.o pkghandler.o helper.o serial.o
-	gcc -Werror -Wall -Wextra -o worker worker.o serial.o pkghandler.o helper.o -lczmq
+	gcc -Werror -Wall -Wextra -o worker worker.o serial.o pkghandler.o helper.o -lzmq
 
 serial.o: serial.h
 	gcc -g -Wall -Wextra -c serial.c

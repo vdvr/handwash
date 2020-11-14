@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <sys/ioctl.h>
-#include <czmq.h>
+#include <zmq.h>
 
 #include "helper.h"
 #include "pkghandler.h"
@@ -37,7 +37,9 @@ int main() {
         char c;
 
         /* zmq */
-        zsock_t *push = zsock_new_push("tcp://localhost:5557");
+        void *context = zmq_ctx_new();
+        void *requester = zmq_socket(context, ZMQ_PUSH);
+        zmq_connect(requester, "tcp://localhost:5557");
         while (1) {
                 int result = rcv_msg(queue, rx_msg, 1);
                 if (result != -1) {
@@ -69,7 +71,7 @@ int main() {
                                         strcat(msg_to_send, tx_msg.pkg.command);
                                         strcat(msg_to_send, "|");
                                         strcat(msg_to_send, tx_msg.pkg.arguments);
-                                        zstr_send(push, msg_to_send);
+                                        zmq_send(requester, msg_to_send, msglen, 0);
                                         // send_msg(queue, tx_msg);
                                 }
                                 busy = 0;
@@ -78,5 +80,4 @@ int main() {
                 } else usleep(20);
         }
         close(fd);
-        zsock_destroy (&push);
 };
