@@ -1,5 +1,4 @@
 #include <avr/io.h>
-#include "uart.h"
 #include "conversion.h"
 
 char ASCIItoChar (char ASCII)

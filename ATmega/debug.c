@@ -3,8 +3,9 @@
 
 void debug_sendString(char* txt)
 {
-    while(*text1 != 0)
+    while(*txt != 0)
 	{
-		uartPutChar(*txt);
+		uartPutChar(*txt++);
 	}
+	uartPutChar('\3');
 }

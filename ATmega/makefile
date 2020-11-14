@@ -7,7 +7,7 @@ nano_F = 16000000
 TARGET = main
 SRCS = $(TARGET).c ${EXTRA}
 
-EXTRA = uart.c buffer.c conversion.c pkg.c board.c msg.c peripheral.c timer2min.c
+EXTRA = uart.c buffer.c conversion.c pkg.c msg.c peripheral.c timer2min.c debug.c
 
 CFLAGS = -std=c99
 CFLAGS += -Wall
@@ -16,7 +16,7 @@ CFLAGS += -Os
 CFLAGS += -Wno-misspelled-isr
 
 m32_flags = -p ${m32} -c usbasp -P usb -F
-nano_flags = -v -p ${nano} -c arduino -P /dev/arduino
+nano_flags = -v -p ${nano} -c arduino -P /dev/arduino 
 
 CC = avr-gcc
 OBJCOPY = avr-objcopy

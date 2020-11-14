@@ -1,7 +1,7 @@
 #ifndef TIMER2MIN_H_
 #define TIMER2MIN_H_
 
-#define TIMER_OF_1HZ 31249
+#define TIMER_OF_1HZ 15624
 
 struct timestamp {
     unsigned int seconds;
@@ -9,6 +9,7 @@ struct timestamp {
 };
 
 extern unsigned int seconds_now;
+extern unsigned int poll_sec;
 
 void timerSetup(void);
 
@@ -17,6 +18,12 @@ void stopTimer(void);
 void startTimer(void);
 
 void resetTimer(void);
+
+void resetPollTimer(void);
+
+void enableTimerIR(void);
+
+void disableTimerIR(void);
 
 struct timestamp getTime();
 

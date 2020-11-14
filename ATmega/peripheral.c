@@ -7,13 +7,16 @@ void peripheral_setup(void)
 {
     F_DDR |= (1 << F_PIN);
     S_DDR |= (1 << S_PIN);
-    F_S_DDR |= (1 << F_S_PIN);
-    S_S_DDR |= (1 << S_S_PIN);
+
+    F_S_DDR &= ~(1 << F_S_PIN);
+    S_S_DDR &= ~(1 << S_S_PIN);
+    F_S_PORT |= (1 << F_S_PIN);
+    S_S_PORT |= (1 << S_S_PIN);
 }
 
 int is_faucet_sensor_set(void) 
 {
-    return F_S_DDR && (1 << F_S_PIN);
+    return ((F_S_PORT_PIN & (1 << F_S_PIN)) != 0);
 }
 
 void faucet_on(void) 

@@ -16,7 +16,9 @@
 
 extern int rpi_avail;
 
-void send_msg(int cmd, char *args);
-int wait_rec_msg(int cmd, int ms);
+void send_msg(char cmd, char *args);
+int wait_rec_msg(int ms, int affermative, int negative);
+void reset_msgs_in(void);
+    
 
 #endif /* MSG_H_ */

@@ -1,5 +1,5 @@
 #include <avr/io.h>
-#include "uart.h"                                            // included for debugging
+#include "uart.h"
 #include "buffer.h"
 #include "pkg.h"
 
@@ -16,20 +16,20 @@ void pkg_destruct()
             if(buffer_used>0)                                // buffer not empty
             {
                 char command = buffer_read();
+
+                if(command==SEP) break;                      // \r is the seperator
                 commands[i] = command;
-                                                             //uartPutChar(command);             // for debugging
-                if(command==SEP) break;                      // null is the seperator
             }
         }
                                                              //uartPutChar('x');
-    for (int i = 0; i < 20; i++) {
-            if(buffer_used>0) {                              // buffer not empty
-                char argument = buffer_read();
-                arguments[i] = argument;
-                                                             //uartPutChar(argument);             // for debugging
-                if((argument==ETX) | (argument == 0)) break; // ETX is the end of pkg, 0 means empty buffer space (error)
-            }
+    for (int i = 0; i < 20; i++) 
+    {
+        if(buffer_used>0) {                              // buffer not empty
+            char argument = buffer_read();
+            if(argument==ETX) break; // ETX is the end of pkg, 0 means empty buffer space (error)
+            arguments[i] = argument;
         }
+    }
     new_pkg--;
     new_msg = 1;
 }

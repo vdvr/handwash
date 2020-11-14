@@ -1,13 +1,16 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-//#include "board.h"
-//#include "buffer.h"
-//#include "pkg.h"
+#include "buffer.h"
+#include "pkg.h"
 #include "timer2min.h"
+#include "msg.h"
+#include "peripheral.h"
 #include "uart.h"
-//#include "msg.h"
-//#include "peripheral.h"
+#include "debug.h"
+
+#define RPI_TIMEOUT_MS 5000			// time to wait for RPI response, high to test
+#define POLL_TIMEOUT_S 30			// time after last action to send POLL request, low to test
 
 // ---------------------------------------
 // STX, ETX and SEP are defined in pkg.h
@@ -30,82 +33,78 @@
 
 // Global variables end -----------------
 
-/*
+
 ISR (USART_RX_vect)             // interrupt for uart receive
 {
-	rpi_avail = 1;
+	char c = _USART_UDR0;
 
-	buffer_write(_USART_UDRE);         // write uart data to ringbuffer
-	if(_USART_UDRE == ETX)             // listen for ETX --> extra pkg in ringbufffer
+	buffer_write(c);         // write uart data to ringbuffer
+	if(c == ETX)             // listen for ETX --> extra pkg in ringbufffer
 	{
 		new_pkg ++;
 	}
-}*/
-
-// ISR(INT0_vect)
-// {
-//     pkg_construct("water","123");
-// }
-
-// ISR(INT1_vect)
-// {
-//     pkg_construct("zeep","123");
-// }
+}
 
 ISR(TIMER1_COMPA_vect)
 {
     seconds_now++;
+	poll_sec++;
 }
-/*
+
 int main(void)
 {
 	sei();
-	uartSetup(57600);
+	peripheral_setup();
+	uartSetup(9600);
 	timerSetup();
-	//startTimer();
+	startTimer();
+	rpi_avail = 1;
+
+	for (volatile long j = 0; j < 1000000; j++);		// make custom delay function based on timer?31
+	//debug_sendString("init");
 
 	for (;;)
 	{
 		if (is_faucet_sensor_set())			// checks if object detected at faucet sensor, copy body for external interrupt
 		{
+			//debug_sendString("faucet detected");
 			if (!rpi_avail)
 			{
+				//debug_sendString("rpi not avail");
 				faucet_on_while_sensor_set();
+				resetPollTimer();
 				continue;
 			}
 
-			send_msg(REQUEST_WATER, "");
-
-			if (wait_perm_msg(500))
+			else
 			{
-				faucet_on_while_sensor_set_with_timeout(2000);
+				//debug_sendString("rpi avail");
+				resetTimer();					// only reset if rpi available
+				reset_msgs_in();
+				send_msg(REQUEST_WATER, "");
+				
+				int result = wait_rec_msg(RPI_TIMEOUT_MS, ACK, NACK);
+				if (result == 1)
+				{
+					//debug_sendString("ack rec");
+					faucet_on_while_sensor_set_with_timeout(2000);
 
-				send_msg(WATER_DONE, "");
+					send_msg(WATER_DONE, "");
+				} 
+				else if (result == -1) 
+				{
+					for (volatile long j = 0; j < 500000; j++);		// delay om niet constant naar water te vragen indien geen toestemming
+				}
 			}
 		}
-	}
-}
-*/
 
-int main(void)
-{
-	uartSetup(9600);
-	timerSetup();
-	startTimer();
-	sei();
-	struct timestamp time = getTime();
-	for (int i = 0; i < 100; i++) 
-	{
-		uartPutASCII(seconds_now);
-		uartPutChar('-');
-		uartPutASCII(TCNT1);
-		uartPutChar('-');
-		uartPutASCII(time.seconds);
-		uartPutChar('-');
-		uartPutASCII(time.extra);
-		uartPutChar('-');
-		while(!checkTimeElapsed(time, i, 0));
-		uartPutASCII(i);
-		uartPutChar('\n');
+		else if ((!rpi_avail) && (poll_sec >= POLL_TIMEOUT_S))
+		{
+			resetTimer();                       // wait_rec_msg gebruikt timestamps
+			reset_msgs_in();
+			send_msg(POLL_REQUEST,"");
+			rpi_avail = wait_rec_msg(RPI_TIMEOUT_MS, POLL_REPLY, NACK); //
+			resetPollTimer();                       // voor volgende poll, voor als de poll faalde
+		}
 	}
 }
