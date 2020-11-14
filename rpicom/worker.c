@@ -79,7 +79,5 @@ int main() {
                         }
                 } else usleep(20);
         }
-        zmq_close(requester);
-        zmq_ctx_destroy(context);
         close(fd);
 };
