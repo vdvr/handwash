@@ -69,7 +69,7 @@ int main() {
                                         strcat(msg_to_send, tx_msg.pkg.command);
                                         strcat(msg_to_send, "|");
                                         strcat(msg_to_send, tx_msg.pkg.arguments);
-                                        zstr_send(push, msg_to_send, msglen);
+                                        zstr_send(push, msg_to_send);
                                         // send_msg(queue, tx_msg);
                                 }
                                 busy = 0;
