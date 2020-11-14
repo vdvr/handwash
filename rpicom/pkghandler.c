@@ -25,12 +25,10 @@ int deserialize(char* serialized, struct Pkg *pkg) {
         if (*serialized == STX) {
                 for (int i=0; *serialized != '\r'; i++)
                         pkg->command[i] = *serialized++;
-                printf("%s\n", pkg->command);
                 for (int i=0; *serialized != ETX; i++) {
                         if (i > 64) return -1;
                         pkg->arguments[i] = *serialized++;
                 }
-                printf("%s\n", pkg->arguments);
                 return 0;
         }
         return -1;

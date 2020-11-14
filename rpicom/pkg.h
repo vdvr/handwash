@@ -2,7 +2,7 @@
 #define __PKGSTRUCT__
 
 struct Pkg {
-	char command[4];
-	char arguments[4];
+	char command[64];
+	char arguments[64];
 };
 #endif
