@@ -27,9 +27,9 @@ int main() {
         struct Msg* rx_msg = (struct Msg*) malloc(sizeof(struct Msg));
         struct Msg tx_msg;
 
-        system("sudo stty -F /dev/arduino -hupcl");
-        system("chmod a+rw /dev/arduino");
-        int fd = serial_open("/dev/arduino");
+        // system("sudo stty -F /dev/arduino -hupcl");
+        // system("chmod a+rw /dev/arduino");
+        int fd = serial_open("/dev/serial0");
         tcflush(fd, TCIOFLUSH);
 
         int busy = 0;
@@ -77,7 +77,7 @@ int main() {
                                 busy = 0;
                                 rxpt = &rx_buffer[0];
                         }
-                } else usleep(20);
+                } else usleep(50);
         }
         close(fd);
 };
