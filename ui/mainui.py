@@ -1,26 +1,35 @@
 from . import StepUI, IdleUI
 import enum
+import zmq
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 from PyQt5.QtWidgets import (
     QMainWindow
 )
-import serial
 
 class Cmd(enum.Enum):
-    ACK = 1
-    NACK = 2
-    REQ_WATER = 3
-    REQ_SOAP = 4
-    WATER_DONE = 5
-    SOAP_DONE = 6
-    
+    ACK = 0x20
+    NACK = 0x21
+    POLL_REQUEST = 0x30
+    POLL_REPLY = 0x31
+    REQ_WATER = 0x32
+    REQ_SOAP = 0x33
+    WATER_DONE = 0x34
+    SOAP_DONE = 0x35
 
+context = zmq.Context()
+
+send_sock = context.socket(zmq.PUSH)
+send_socket.connect('tcp://127.0.0.1:5556')
+
+recv_sock = context.socket(zmq.PUSH)
+recv_socket.connect('tcp://127.0.0.1:5555')
 
 class MainUI(QMainWindow):
-    def __init__(self, device, steps, startTxt=None, styleFile=None):
+    def __init__(self, steps, startTxt=None, styleFile=None):
         super().__init__()
 
-        self.com = serial.Serial(device, 9600, timeout=0)
+        self.sender = send_socket
+        self.receiver = recv_socket
 
         if styleFile != None:
             with open(styleFile) as styleFileObj:
@@ -90,13 +99,14 @@ class MainUI(QMainWindow):
 
 
     def sendMsg(self, cmd, args):
-        payload = f"{cmd.value}{args}\n".encode("ascii")
-        self.com.write(payload)
+        payload = cmd + ';' + args
+        self.sender.send_string(payload)
 
 
     def getMsg(self):
-        payload = self.com.readline()
+        payload = self.receiver.recv_string()
         if payload:
             msg = payload.decode("ascii")
-            cmd = Cmd(int(msg[0]))
-            return {"cmd": cmd, "args": msg[:-1]}
+            msg.split(';')
+            cmd = Cmd(msg[0])
+            return {"cmd": cmd, "args": msg[1:]}
