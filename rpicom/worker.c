@@ -38,7 +38,7 @@ int main() {
 
         /* zmq */
         void *context = zmq_ctx_new ();
-        void *requester = zmq_socket (context, ZMQ_REQ);
+        void *requester = zmq_socket (context, ZMQ_PUSH);
         zmq_connect (requester, "tcp://localhost:5557");
         while (1) {
                 int result = rcv_msg(queue, rx_msg, 1);
