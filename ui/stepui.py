@@ -81,6 +81,7 @@ class StepUI(QWidget):
         # Exit if no steps left
         stepsLeft = len(self.stepQueue)
         if stepsLeft < 1:
+            self.mediaView.mediaplayer.stop()
             self.finished.emit()
             return
 
