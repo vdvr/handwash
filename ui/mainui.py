@@ -1,6 +1,7 @@
 from . import StepUI, IdleUI
 import enum
 import zmq
+import codecs
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 from PyQt5.QtWidgets import (
     QMainWindow
@@ -9,27 +10,28 @@ from PyQt5.QtWidgets import (
 class Cmd(enum.Enum):
     ACK = 0x20
     NACK = 0x21
-    POLL_REQUEST = 0x30
-    POLL_REPLY = 0x31
-    REQ_WATER = 0x32
-    REQ_SOAP = 0x33
-    WATER_DONE = 0x34
-    SOAP_DONE = 0x35
+    POLL_REQUEST = '0'
+    POLL_REPLY = '1'
+    REQ_WATER = '2'
+    REQ_SOAP = '3'
+    WATER_DONE = '4'
+    SOAP_DONE = '5'
 
-context = zmq.Context()
-
-send_sock = context.socket(zmq.PUSH)
-send_socket.connect('tcp://127.0.0.1:5556')
-
-recv_sock = context.socket(zmq.PUSH)
-recv_socket.connect('tcp://127.0.0.1:5555')
 
 class MainUI(QMainWindow):
     def __init__(self, steps, startTxt=None, styleFile=None):
         super().__init__()
 
-        self.sender = send_socket
-        self.receiver = recv_socket
+        context = zmq.Context()
+
+        send_sock = context.socket(zmq.PUSH)
+        send_sock.connect('tcp://127.0.0.1:5556')
+
+        recv_sock = context.socket(zmq.PULL)
+        recv_sock.connect('tcp://127.0.0.1:5555')
+
+        self.sender = send_sock
+        self.receiver = recv_sock
 
         if styleFile != None:
             with open(styleFile) as styleFileObj:
@@ -48,7 +50,7 @@ class MainUI(QMainWindow):
     def show(self):
         self.setWindowTitle("Hand Wash Mirror")
         #self.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.showFullScreen()
+        self.showNormal()
 
 
     @pyqtSlot() 
@@ -99,14 +101,14 @@ class MainUI(QMainWindow):
 
 
     def sendMsg(self, cmd, args):
-        payload = cmd + ';' + args
+        payload = str(cmd.value) + ';' + args
         self.sender.send_string(payload)
 
 
     def getMsg(self):
         payload = self.receiver.recv_string()
         if payload:
-            msg = payload.decode("ascii")
-            msg.split(';')
-            cmd = Cmd(msg[0])
-            return {"cmd": cmd, "args": msg[1:]}
+            payload.split(';')
+            print(payload[0])
+            cmd = Cmd(payload[0])
+            return {"cmd": cmd, "args": payload[1:]}

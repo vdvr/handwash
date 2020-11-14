@@ -3,14 +3,12 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
-[dev-packages]
-python-magic-bin = "==0.4.14"
-
 [packages]
 pyqt5 = "*"
 pyyaml = "*"
 python-magic = "*"
 python-vlc = "*"
+pyserial-asyncio = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.7"
