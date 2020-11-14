@@ -13,6 +13,7 @@ def handler(msg_cmd, msg_args):
 		proc_args = "req;state;"
 		proc_msg = proc_cmd + '|' + proc_args
 		send_socket.send_string(proc_msg)		
+        print(f'\n[server.py] I demand the procedure state atm.\n')
 
 def print_incoming_messages():
     recv_socket = context.socket(zmq.PULL)
@@ -23,8 +24,6 @@ def print_incoming_messages():
         msg = msg.split('|')
         msg_cmd = msg[0]
         msg_args = msg[1]
-        print(f'\n[server.py] cmd from worker: {msg_cmd}\n')
-        print(f'\n[server.py] args from worker: {msg_args}\n')
 
         handler(msg_cmd, msg_args)
 

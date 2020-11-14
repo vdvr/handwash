@@ -64,8 +64,6 @@ int main() {
                                 if (deserialize(rx_buffer, &tx_msg.pkg) != -1) {
                                         queue = create_queue(key);
                                         tx_msg.type = 2;
-                                        printf("\n[worker] cmd: %s\n", tx_msg.pkg.command);
-                                        printf("\n[worker] args: %s\n", tx_msg.pkg.arguments);
                                         int msglen = strlen(tx_msg.pkg.command)+strlen(tx_msg.pkg.arguments)+1;
                                         char msg_to_send[msglen];
                                         strcat(msg_to_send, tx_msg.pkg.command);
