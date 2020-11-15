@@ -11,6 +11,7 @@ pyqt5 = "*"
 pyyaml = "*"
 python-magic = "*"
 python-vlc = "*"
+zmq = "*"
 
 [requires]
 python_version = "3.8"

@@ -29,7 +29,9 @@ class MainUI(QMainWindow):
         super().__init__()
 
         self.sender = send_socket
-        self.receiver = recv_socket
+        self.receiver = 
+        
+        self.setCursor(Qt.BlankCursor)
 
         if styleFile != None:
             with open(styleFile) as styleFileObj:
