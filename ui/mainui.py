@@ -1,33 +1,37 @@
 from . import StepUI, IdleUI
 import enum
 import zmq
+import codecs
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 from PyQt5.QtWidgets import (
     QMainWindow
 )
 
-
-context = zmq.Context()
-send_socket = context.socket(zmq.PUSH)
-send_socket.connect('tcp://127.0.0.1:5557')
-recv_socket = context.socket(zmq.PULL)
-recv_socket.connect('tcp://127.0.0.1:5556')
-
-
 class Cmd(enum.Enum):
-    ACK = 1
-    NACK = 2
-    REQ_WATER = 3
-    REQ_SOAP = 4
-    WATER_DONE = 5
-    SOAP_DONE = 6
+    ACK = 0x20
+    NACK = 0x21
+    POLL_REQUEST = '0'
+    POLL_REPLY = '1'
+    REQ_WATER = '2'
+    REQ_SOAP = '3'
+    WATER_DONE = '4'
+    SOAP_DONE = '5'
 
 
 class MainUI(QMainWindow):
     def __init__(self, steps, startTxt=None, styleFile=None):
         super().__init__()
 
-        self.com = serial.Serial("COM8", 9600, timeout=0)
+        context = zmq.Context()
+
+        send_sock = context.socket(zmq.PUSH)
+        send_sock.connect('tcp://127.0.0.1:5556')
+
+        recv_sock = context.socket(zmq.PULL)
+        recv_sock.connect('tcp://127.0.0.1:5557')
+
+        self.sender = send_sock
+        self.receiver = recv_sock
 
         if styleFile != None:
             with open(styleFile) as styleFileObj:
@@ -46,7 +50,7 @@ class MainUI(QMainWindow):
     def show(self):
         self.setWindowTitle("Hand Wash Mirror")
         #self.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.showFullScreen()
+        self.showNormal()
 
 
     @pyqtSlot() 
@@ -97,20 +101,15 @@ class MainUI(QMainWindow):
 
 
     def sendMsg(self, cmd, args):
-        send_msg = cmd + '|' + args
-        send_socket.send_string(send_msg)
+        payload = str(cmd.value) + ';' + args
+        self.sender.send_string(payload)
+
 
     def getMsg(self):
-        payload = recv_socket.recv_string()
+        payload = self.receiver.recv_string()
+        print(payload)
         if payload:
-            payload = payload.split('|')
-            if (payload[0] == "water"):
-                if (payload[1] == "request;"):
-                    return {"cmd": Cmd["REQ_WATER"], "args": payload[1]}
-                elif (payload[1] == "done;"):
-                    return {"cmd": Cmd["WATER_DONE"], "args": payload[1]}
-            elif (payload[0] == "soap"):
-                if (payload[1] == "request;"):
-                    return {"cmd": Cmd["REQ_SOAP"], "args": payload[1]}
-                elif (payload[1] == "done;"):
-                    return {"cmd": Cmd["SOAP_DONE"], "args": payload[1]}
+            payload.split(';')
+            print(payload[0])
+            cmd = Cmd(payload[0])
+            return {"cmd": cmd, "args": payload[1:]}

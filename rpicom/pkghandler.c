@@ -9,6 +9,8 @@
 #include "serial.h"
 
 void serialize(struct Pkg* pkg, char* serialized) {
+	memset(pkg->command, '\0', 64);
+	memset(pkg->arguments, '\0', 64);
         *serialized++ = STX;
         for(char i=0; i <= 3; i++) {
                 *serialized++ = *(pkg->command+i);
@@ -22,7 +24,11 @@ void serialize(struct Pkg* pkg, char* serialized) {
 };
 
 int deserialize(char* serialized, struct Pkg *pkg) {
-        if (*serialized == STX) {
+	memset(pkg->command, '\0', 64);
+	memset(pkg->arguments, '\0', 64);
+        if (*serialized++ == STX) {
+		while (*serialized == STX)
+			serialized++;
                 for (int i=0; *serialized != '\r'; i++)
                         pkg->command[i] = *serialized++;
                 for (int i=0; *serialized != ETX; i++) {

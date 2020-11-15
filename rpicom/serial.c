@@ -57,7 +57,7 @@ int serial_get_char(const int fd) {
 
         if (read (fd, &x, 1) != 1)
                 return -1;
-
+	
         return ((int)x) & 0xFF;
 }
 void serial_send_char(const int fd, const unsigned char c) {

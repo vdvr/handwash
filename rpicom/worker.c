@@ -17,16 +17,15 @@
 int main() {
         char tx_buffer[BUFF_SIZE] = {'\0'};
         char rx_buffer[BUFF_SIZE] = {'\0'};
-
+	int zres = 1;
         char* rxpt;
         rxpt = &rx_buffer[0];
 
         key_t key = generate_key();
         int queue = create_queue(key);
 
-        struct Msg* rx_msg = (struct Msg*) malloc(sizeof(struct Msg));
-        struct Msg tx_msg;
-
+        struct Msg* rx_msg = (struct Msg*) malloc(sizeof(struct Msg)); 
+	struct Msg tx_msg; 
         // system("sudo stty -F /dev/arduino -hupcl");
         // system("chmod a+rw /dev/arduino");
         int fd = serial_open("/dev/serial0");
@@ -39,7 +38,7 @@ int main() {
         /* zmq */
         void *context = zmq_ctx_new();
         void *requester = zmq_socket(context, ZMQ_PUSH);
-        zmq_connect(requester, "tcp://localhost:5557");
+        zmq_connect(requester, "tcp://127.0.0.1:5557");
         while (1) {
                 int result = rcv_msg(queue, rx_msg, 1);
                 if (result != -1) {
@@ -56,20 +55,19 @@ int main() {
                                 *rxpt++ = STX; // Read in the whole frame!
                         }
                         while ((c != ETX) && busy) {
-                                *rxpt++ = c;
                                 c = serial_get_char(fd);
+                                *rxpt++ = c;
                         }
-                        *rxpt++ = ETX;
                         if (c == ETX) {
+				*rxpt++ = ETX;
                                 if (deserialize(rx_buffer, &tx_msg.pkg) != -1) {
                                         queue = create_queue(key);
                                         tx_msg.type = 2;
-                                        int msglen = strlen(tx_msg.pkg.command)+strlen(tx_msg.pkg.arguments)+1;
-                                        char msg_to_send[msglen];
+                                        char msg_to_send[100] = {'\0'};
                                         strcat(msg_to_send, tx_msg.pkg.command);
-                                        strcat(msg_to_send, "|");
+                                        strcat(msg_to_send, ";");
                                         strcat(msg_to_send, tx_msg.pkg.arguments);
-                                        zmq_send(requester, msg_to_send, msglen, 0);
+                                        zres = zmq_send(requester, msg_to_send, strlen(msg_to_send), 0);
                                 }
                                 busy = 0;
                                 rxpt = &rx_buffer[0];
