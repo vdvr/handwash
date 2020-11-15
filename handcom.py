@@ -1,18 +1,10 @@
-import asyncio
+from asyncio import get_event_loop
+import binascii
 import concurrent
 import zmq
 import threading
-from serial import Serial
-
-class Cmd(enum.Enum):
-    ACK = 0x20
-    NACK = 0x21
-    POLL_REQUEST = 0x30
-    POLL_REPLY = 0x31
-    REQ_WATER = 0x32
-    REQ_SOAP = 0x33
-    WATER_DONE = 0x34
-    SOAP_DONE = 0x35
+import serial
+from time import sleep
 
 class Package:
     def __init__(self, command, arguments) -> None:
@@ -27,6 +19,7 @@ class Package:
 
     def serialize(self) -> str:
         return self.command + ';' + self.arguments
+    
 
 context = zmq.Context()
 ui_sock = context.socket(zmq.PUSH)
@@ -45,54 +38,24 @@ def serialize(pkg: Package) -> str:
     serialized += '\x00'
     
 
-def deserialize(serialized: str) -> Package:
+def deserialize(serialized) -> Package:
     """
     Deserialize a package to its components
     """
-    if (serialized[0] == '\x02'): # STX check
-        if (serialized[-2] == '\x03'): # ETX check
-            serialized = serialized[1:-2].split('\r') # ['cmd\x00', 'args\x00']
-            return Package(serialized[0][:-1], serialized[1][:-1])
+    if (serialized[0] == 2): # STX check
+        if (serialized[-1] == 3): # ETX
+            string = serialized[1:-1]
+            string = ''.join(chr(i) for i in string)
+            string = string.split('\r')
 
-# Normal serial blocking reads
-# This could also do any processing required on the data
-def get_byte():
-    b = s.read(1)
-    # print(b)
-    return b
-
-# Runs blocking function in executor, yielding the result
-@asyncio.coroutine
-def get_byte_async():
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-        res = yield from loop.run_in_executor(executor, get_byte)
-        return res
-
-def get_and_print():
-    b = ''
-    readed = b""
-    while (b != b'\x02'):
-        b = yield from get_byte_async()
-    readed += b'\x02'
-    while (b != b'\x03'):
-        readed += yield from get_byte_async()
-    return readed
-        
-
-s = Serial("/dev/serial0", 57600, timeout=10)
-loop = asyncio.get_event_loop()
-
-def roll():
-    loop.run_until_complete(get_and_print())
-    pkg = deserialize(readed)
-    ui_sock.send_string(pkg.serialize())
+            return Package(string[0], string[1])
 
 if __name__ == "__main__":
-    readed = ""
-    try:
-        roll()
-    except KeyboardInterrupt:
-        loop.close()
-        pass
-    finally:
-        roll()
+    readed = b""
+    b = b""
+    while True:
+        ser = serial.Serial('/dev/serial0', 57600)
+        read = ser.read_until(b'\x03')
+        pkg = deserialize(read)
+        ui_sock.send_string(pkg.serialize())
+        sleep(0.02)

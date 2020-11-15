@@ -9,7 +9,7 @@ from ui import (
 )
 from PyQt5.QtGui import QFontDatabase
 
-locale.setlocale(locale.LC_TIME, "nl_be")
+locale.setlocale(locale.LC_TIME, "nl_BE.utf8")
 
 with open('steps.yaml') as f:
     yConfig = yaml.safe_load(f)
