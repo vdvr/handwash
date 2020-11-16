@@ -6,12 +6,8 @@
 #include "helper.h"
 #include "msg.h"
 
-key_t generate_key() {
-	return ftok("token", 60);
-};
-
-int create_queue(key_t key) {
-	return msgget(key, 0666 | IPC_CREAT);
+int create_queue() {
+	return msgget(778899, 0666 | IPC_CREAT);
 };
 
 void destroy_queue(int queue) {

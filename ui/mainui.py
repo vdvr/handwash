@@ -1,7 +1,8 @@
 from . import StepUI, IdleUI
 import enum
-import zmq
+import sysv_ipc
 import codecs
+
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 from PyQt5.QtWidgets import (
     QMainWindow
@@ -22,16 +23,11 @@ class MainUI(QMainWindow):
     def __init__(self, steps, startTxt=None, styleFile=None):
         super().__init__()
 
-        context = zmq.Context()
+        rq = sysv_ipc.MessageQueue(12345, sysv_ipc.IPC_CREAT)
+        sq = sysv_ipc.MessageQueue(778899, sysv_ipc.IPC_CREAT)
 
-        send_sock = context.socket(zmq.PUSH)
-        send_sock.connect('tcp://127.0.0.1:5556')
-
-        recv_sock = context.socket(zmq.PULL)
-        recv_sock.connect('tcp://127.0.0.1:5557')
-
-        self.sender = send_sock
-        self.receiver = recv_sock
+        self.sender = sq
+        self.receiver = rq
 
         if styleFile != None:
             with open(styleFile) as styleFileObj:
@@ -102,14 +98,15 @@ class MainUI(QMainWindow):
 
     def sendMsg(self, cmd, args):
         payload = str(cmd.value) + ';' + args
-        self.sender.send_string(payload)
+        self.sender.send(payload, True, type=1)
 
 
     def getMsg(self):
-        payload = self.receiver.recv_string()
+        payload = self.receiver.receive()
+        (payload, payload_type) = payload
+        payload = payload.decode("utf-8").split('\x00', 1)[0]
         print(payload)
         if payload:
             payload.split(';')
-            print(payload[0])
             cmd = Cmd(payload[0])
             return {"cmd": cmd, "args": payload[1:]}
