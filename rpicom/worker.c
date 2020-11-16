@@ -17,28 +17,23 @@
 int main() {
         char tx_buffer[BUFF_SIZE] = {'\0'};
         char rx_buffer[BUFF_SIZE] = {'\0'};
-	int zres = 1;
         char* rxpt;
         rxpt = &rx_buffer[0];
 
-        key_t key = generate_key();
-        int queue = create_queue(key);
+        int queue = create_queue();
 
         struct Msg* rx_msg = (struct Msg*) malloc(sizeof(struct Msg)); 
 	struct Msg tx_msg; 
-        // system("sudo stty -F /dev/arduino -hupcl");
-        // system("chmod a+rw /dev/arduino");
-        int fd = serial_open("/dev/serial0");
+        system("sudo stty -F /dev/arduino -hupcl");
+        system("chmod a+rw /dev/arduino");
+        int fd = serial_open("/dev/arduino");
         tcflush(fd, TCIOFLUSH);
 
         int busy = 0;
         int num;
         char c;
+	int pyid = msgget( (key_t)12345, IPC_CREAT | 0666);
 
-        /* zmq */
-        void *context = zmq_ctx_new();
-        void *requester = zmq_socket(context, ZMQ_PUSH);
-        zmq_connect(requester, "tcp://127.0.0.1:5557");
         while (1) {
                 int result = rcv_msg(queue, rx_msg, 1);
                 if (result != -1) {
@@ -61,13 +56,8 @@ int main() {
                         if (c == ETX) {
 				*rxpt++ = ETX;
                                 if (deserialize(rx_buffer, &tx_msg.pkg) != -1) {
-                                        queue = create_queue(key);
                                         tx_msg.type = 2;
-                                        char msg_to_send[100] = {'\0'};
-                                        strcat(msg_to_send, tx_msg.pkg.command);
-                                        strcat(msg_to_send, ";");
-                                        strcat(msg_to_send, tx_msg.pkg.arguments);
-                                        zres = zmq_send(requester, msg_to_send, strlen(msg_to_send), 0);
+					msgsnd( pyid, &tx_msg, sizeof(struct Pkg), tx_msg.type);
                                 }
                                 busy = 0;
                                 rxpt = &rx_buffer[0];

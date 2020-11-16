@@ -14,7 +14,7 @@
 
 int serial_open(const char *device) {
         struct termios options;
-        speed_t myBaud = B57600;
+        speed_t myBaud = B9600;
         int     status, fd;
 
         if ((fd = open (device, O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK)) == -1)

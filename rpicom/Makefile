@@ -20,11 +20,10 @@ worker.o: worker.c pkghandler.h pkg.h msg.h serial.h pkg.h
 	gcc -g -Wall -Wextra -c worker.c
 
 clean:
-	rm *.o msgWriter msgReader worker
+	rm *.o msgWriter worker
 
 all:
 	make worker
-	make msgReader
 	make msgWriter
 
 rebuild:
