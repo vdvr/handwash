@@ -10,7 +10,7 @@
 #include "debug.h"
 
 #define RPI_TIMEOUT_MS 5000			// time to wait for RPI response, high to test
-#define POLL_TIMEOUT_S 30			// time after last action to send POLL request, low to test
+#define POLL_TIMEOUT_S 10			// time after last action to send POLL request, low to test
 
 // ---------------------------------------
 // STX, ETX and SEP are defined in pkg.h
@@ -55,7 +55,7 @@ int main(void)
 {
 	sei();
 
-	debug_port_setup();
+	//debug_port_setup();
 
 	peripheral_setup();
 	uartSetup(9600);
@@ -69,7 +69,7 @@ int main(void)
 	for (;;)
 	{
 
-		if(debug_port_read(0)) pkg_construct("water","");
+		//if(debug_port_read(0)) pkg_construct("water","");
 
 
 		if (is_faucet_sensor_set())			// checks if object detected at faucet sensor, copy body for external interrupt
@@ -105,6 +105,41 @@ int main(void)
 			}
 		}
 
+		
+
+		else if (is_soap_sensor_set())
+		{
+			//debug_sendString("soap detected");
+			if (!rpi_avail)
+			{
+				//debug_sendString("rpi not avail");
+				soap_on_while_sensor_set();
+				resetPollTimer();
+				continue;
+			}
+
+			else
+			{
+				//debug_sendString("rpi avail");
+				resetTimer();					// only reset if rpi available
+				reset_msgs_in();
+				send_msg(REQUEST_SOAP, "");
+				
+				int result = wait_rec_msg(RPI_TIMEOUT_MS, ACK, NACK);
+				if (result == 1)
+				{
+					//debug_sendString("ack rec");
+					soap_on_while_sensor_set();
+
+					send_msg(SOAP_DONE, "");
+				} 
+				else if (result == -1) 
+				{
+					for (volatile long j = 0; j < 500000; j++);		// delay om niet constant naar zeep te vragen indien geen toestemming
+				}
+			}
+		}
+
 		else if ((!rpi_avail) && (poll_sec >= POLL_TIMEOUT_S))
 		{
 			resetTimer();                       // wait_rec_msg gebruikt timestamps
@@ -112,6 +147,8 @@ int main(void)
 			send_msg(POLL_REQUEST,"");
 			rpi_avail = wait_rec_msg(RPI_TIMEOUT_MS, POLL_REPLY, NACK); //
 			resetPollTimer();                       // voor volgende poll, voor als de poll faalde
+			// if (rpi_avail) debug_sendString("rpi avail");
+			// else debug_sendString("rpi not avail");
 		}
 	}
 }
