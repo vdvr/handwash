@@ -16,7 +16,6 @@ void pkg_destruct()
             if(buffer_used>0)                                // buffer not empty
             {
                 char command = buffer_read();
-
                 if(command==SEP) break;                      // \r is the seperator
                 commands[i] = command;
             }
