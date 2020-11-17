@@ -5,18 +5,18 @@
 
 void peripheral_setup(void)
 {
-    F_DDR |= (1 << F_PIN);
-    S_DDR |= (1 << S_PIN);
+    F_DDR |= (1 << F_PIN);              // output
+    S_DDR |= (1 << S_PIN);              // output
 
-    F_S_DDR &= ~(1 << F_S_PIN);
-    S_S_DDR &= ~(1 << S_S_PIN);
-    F_S_PORT |= (1 << F_S_PIN);
-    S_S_PORT |= (1 << S_S_PIN);
+    F_S_DDR &= ~(1 << F_S_PIN);         // input
+    S_S_DDR &= ~(1 << S_S_PIN);         // input
+    F_S_PORT |= (1 << F_S_PIN);         // pullup
+    S_S_PORT |= (1 << S_S_PIN);         // pullup
 }
 
 int is_faucet_sensor_set(void) 
 {
-    return ((F_S_PORT_PIN & (1 << F_S_PIN)) != 0);
+    return ((F_S_PORT_PIN & (1 << F_S_PIN)) == 0);      // was eerst !=0 dan is het voor hoog actief
 }
 
 void faucet_on(void) 
@@ -67,7 +67,7 @@ void faucet_on_while_sensor_set_with_timeout(int timeout)
 {
     struct timestamp start_time;
     unsigned int timeout_s = timeout / 1000;
-    unsigned int timout_e = (timeout % 1000) * TIMER_OF_1HZ / 1000; // convert ms to extra
+    unsigned int timeout_e = (timeout % 1000) * TIMER_OF_1HZ / 1000; // convert ms to extra
     int is_on_again = 0;
 
     while (true) 
@@ -91,7 +91,7 @@ void faucet_on_while_sensor_set_with_timeout(int timeout)
         else faucet_off();
 
         start_time = getTime();
-        while (!checkTimeElapsed(start_time, timeout_s, timout_e))
+        while (!checkTimeElapsed(start_time, timeout_s, timeout_e))
         {
             if (is_faucet_sensor_set()) {
                 is_on_again = 1;
@@ -102,4 +102,46 @@ void faucet_on_while_sensor_set_with_timeout(int timeout)
         if (is_on_again) continue;
         else return;
     }
+}
+
+//-------------- SOAP -------------
+
+int is_soap_sensor_set(void) 
+{
+    return ((S_S_PORT_PIN & (1 << S_S_PIN)) == 0);      // was eerst !=0 dan is het voor hoog actief
+}
+
+void soap_on(void) 
+{
+    S_PORT |= (1 << S_PIN);
+}
+
+void soap_off(void)
+{
+    S_PORT &= ~(1 << S_PIN);
+}
+
+void soap_on_while_sensor_set(void)
+{
+    struct timestamp start_time;
+
+    // start_time = getTime();                     // voorstel: voor kijken of de sensor geset is, voorkomen zeep naast hand.
+    // while(true)
+    // {
+    //     if(checkTimeElapsed(start_time,5,0)) return;
+    //     if(is_soap_sensor_set()) break;
+    // }
+
+    start_time = getTime();
+    soap_on();
+    while(!checkTimeElapsed(start_time, 2, 0));
+    soap_off();
+
+    start_time = getTime();
+    while(true)                                 // wachten to zeep sensor niet meer geset is want anders gaan ze meer zeep krijgen als rpi_not avail
+    {
+        if(!is_soap_sensor_set()) break;        // wachten in de stap is niet erg voor rpi, soap done word pas hierna gestuurd
+    }
+
+    // voorstel: hier send msg
 }

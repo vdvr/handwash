@@ -4,14 +4,14 @@
 #define true 1
 
 // faucet
-#define F_DDR DDRB
-#define F_PORT PORTB
-#define F_PIN PB0
+#define F_DDR DDRD
+#define F_PORT PORTD
+#define F_PIN PD5
 
 // soap
-#define S_DDR DDRB
-#define S_PORT PORTB
-#define S_PIN PB1
+#define S_DDR DDRD
+#define S_PORT PORTD
+#define S_PIN PD7
 
 // faucet sensor
 #define F_S_DDR DDRD
@@ -31,5 +31,10 @@ void faucet_on(void);
 void faucet_off(void);
 void faucet_on_while_sensor_set(void);
 void faucet_on_while_sensor_set_with_timeout(int timeout);
+
+int is_soap_sensor_set(void);
+void soap_on(void);
+void soap_off(void);
+void soap_on_while_sensor_set(void);
 
 #endif /* PERIPHERAL_H_ */
