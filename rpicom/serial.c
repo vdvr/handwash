@@ -65,7 +65,7 @@ int serial_get_char(const int fd) {
 	if (x < 0x30)
 		fprintf(stderr, "[DBG: SERIAL] Unprintable ( less then 0x30 )\n");
 
-	fprintf(stderr, "[DBG: SERIAL] %c\n", x));
+	fprintf(stderr, "[DBG: SERIAL] %c\n", x);
 #endif
         return x;
 }
