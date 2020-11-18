@@ -104,7 +104,7 @@ class MainUI(QMainWindow):
     def getMsg(self):
         try:
             payload = self.receiver.receive(block=False)
-        except BusyError:
+        except:
             return
         (payload, payload_type) = payload
         payload = payload.decode("utf-8").split('\x00', 1)[0]
