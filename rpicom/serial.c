@@ -64,8 +64,9 @@ int serial_get_char(const int fd) {
         if (read (fd, &x, 1) != 1)
                 return -1;
 	
+	/* print message if wanted */
 	if (DEBUG)
-		printf("[DBG: SERIAL] %c\n", ((int)x & 0xFF));
+		fprintf(stderr, "[DBG: SERIAL] %c\n", ((int)x & 0xFF));
 
         return ((int)x) & 0xFF;
 }

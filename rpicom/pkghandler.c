@@ -25,7 +25,6 @@ void serialize(struct Pkg* pkg, char* serialized) {
         *serialized++ = STX;
 
 	/* Then we copy the command into serialized */
-	int i = 0;
         for(; *_command != '\0';)
                 *serialized++ = *_command++;
 
