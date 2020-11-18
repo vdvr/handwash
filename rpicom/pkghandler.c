@@ -72,7 +72,7 @@ int deserialize(char* serialized, struct Pkg *pkg) {
 		*_command++ = *serialized++;
 
 	/* Write serialized arguments to pkg->arguments */
-	for (; *serialized != SEP; iteration_count++)
+	for (; *serialized != ETX; iteration_count++)
 		*_arguments++ = *serialized++;
 
 	/* Everything OK */

@@ -103,24 +103,3 @@ int read_pkg(int fd, char* buff) {
 	/* We are done */
 	return 0;
 }
-
-// int check_pkg(char* buff) {
-// 
-// 	/* Package needs to end with ETX */
-// 	if (*buff-- != ETX)
-// 		return 1;
-// 	
-// 	/* Arguments may not exceed bounds
-// 	 * And also this checks if there is a \r separator */
-// 	int count = 0;
-// 	for (; *buff-- != '\r'; count++)
-// 		if (count > BUFF_SIZE) return 1;
-// 
-// 	/* Command may not exceed bounds and package needs to end with ETX */
-// 	count = 0;
-// 	for (; *buff-- != STX; count++)
-// 		if (count > BUFF_SIZE) return 1;
-// 
-// 	return 0;
-// }
-
