@@ -12,7 +12,6 @@
 #include "serial.h"
 
 #define BUFF_SIZE   100
-#define PYTHON_QUEUE_KEY 12345
 
 int read_until_start(int fd);
 int read_pkg(int fd, char* buff);
@@ -25,8 +24,7 @@ int main() {
         char rx_buffer[BUFF_SIZE] = {'\0'};
 
 	/* Make pointer rxpt to iterate over rx_buffer */
-        char* rxpt;
-        rxpt = &rx_buffer[0];
+        char* rxpt; rxpt = &rx_buffer[0]; 
 
 	/* Create msg structs for IPC messaging */
         struct Msg* rx_msg = (struct Msg*) malloc(sizeof(struct Msg)); 
@@ -46,12 +44,13 @@ int main() {
         int num;
 
 	/* Python end POSIX message queue */
-	int pyid = msgget( (key_t)PYTHON_QUEUE_KEY, IPC_CREAT | 0666);
+	int sendq = msgget( 12345, IPC_CREAT | 0666);
+	int recvq = msgget( 778899, IPC_CREAT | 0666);
 
         while (1) {
 
 		/* If message from python UI */
-                int result = rcv_msg( pyid, rx_msg, 1 );
+                int result = rcv_msg(recvq, rx_msg, 1 );
                 if (result != -1) {
                         memset(tx_buffer, 0, sizeof(tx_buffer));
                         serialize(&rx_msg->pkg, &tx_buffer[0]);
@@ -73,7 +72,7 @@ int main() {
 			/* Send the tx_msg message to the python queue */
 			tx_msg.type = 2;
 			if (deserialize(rx_buffer, &tx_msg.pkg) != -1)
-				msgsnd( pyid, &tx_msg, sizeof(struct Pkg), tx_msg.type);
+				msgsnd( sendq, &tx_msg, sizeof(struct Pkg), tx_msg.type);
 			rxpt = &rx_buffer[0];
                 } 
 		else 

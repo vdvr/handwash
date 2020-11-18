@@ -10,10 +10,6 @@
 
 void serialize(struct Pkg* pkg, char* serialized) {
 	
-	/* Zero out the command and arguments field */
-	memset(pkg->command, '\0', 64);
-	memset(pkg->arguments, '\0', 64);
-
 	/* Create cursor pointers for both the pkg->command and 
 	 * pkg->arguments */
 	const char* _command = pkg->command;
@@ -38,11 +34,6 @@ void serialize(struct Pkg* pkg, char* serialized) {
 	/* End serialized */
         *serialized++ = ETX;
         *serialized++ = '\0';
-
-	/* Free up the cursor pointers and pkg */
-	free((char*) _command);
-	free((char*) _arguments);
-	free(pkg);
 };
 
 int deserialize(char* serialized, struct Pkg *pkg) {

@@ -46,7 +46,7 @@ class MainUI(QMainWindow):
     def show(self):
         self.setWindowTitle("Hand Wash Mirror")
         #self.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.showNormal()
+        self.showFullScreen()
 
 
     @pyqtSlot() 
