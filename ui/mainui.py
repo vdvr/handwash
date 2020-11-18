@@ -11,12 +11,12 @@ from PyQt5.QtWidgets import (
 class Cmd(enum.Enum):
     ACK = 0x20
     NACK = 0x21
-    POLL_REQUEST = '0'
-    POLL_REPLY = '1'
-    REQ_WATER = '2'
-    REQ_SOAP = '3'
-    WATER_DONE = '4'
-    SOAP_DONE = '5'
+    POLL_REQUEST = 0x30
+    POLL_REPLY = 0x31
+    REQ_WATER = 0x32
+    REQ_SOAP = 0x33
+    WATER_DONE = 0x34
+    SOAP_DONE = 0x35
 
 
 class MainUI(QMainWindow):
@@ -101,7 +101,8 @@ class MainUI(QMainWindow):
 
 
     def sendMsg(self, cmd, args):
-        payload = str(cmd.value) + ';' + args
+        payload = chr(cmd.value) + ';' + args
+        print("mainui.py:sendMsg " + payload)
         self.sender.send(payload, True, type=1)
 
 
@@ -115,5 +116,5 @@ class MainUI(QMainWindow):
         print("mainui.py:getMsg " + payload)
         if payload:
             payload.split(';')
-            cmd = Cmd(payload[0])
+            cmd = Cmd(ord(payload[0]))
             return {"cmd": cmd, "args": payload[1:]}
