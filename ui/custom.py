@@ -5,8 +5,6 @@ import vlc
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer, QUrl
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtSvg import QGraphicsSvgItem
-#from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
-from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWidgets import (
     QWidget,
     QLabel,
