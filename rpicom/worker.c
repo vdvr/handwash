@@ -46,9 +46,8 @@ int main() {
 	/* Flush the data already in buffer */
         tcflush(fd, TCIOFLUSH);
 
-        int busy = 0;
+	/* Number of available characters */
         int num;
-        char c;
 
 	/* Python end POSIX message queue */
 	int pyid = msgget( (key_t)PYTHON_QUEUE_KEY, IPC_CREAT | 0666);
