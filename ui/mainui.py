@@ -70,6 +70,10 @@ class MainUI(QMainWindow):
             
         cmd = msg["cmd"]
 
+        if cmd == Cmd["POLL_REQUEST"]:
+            self.sendMsg(Cmd["POLL_REPLY"], "")
+            return
+
         if not self.isStarted:
             if (cmd == Cmd["REQ_WATER"] and self.steps[0].water or
                 cmd == Cmd["REQ_SOAP"] and self.steps[0].soap):
@@ -102,7 +106,10 @@ class MainUI(QMainWindow):
 
 
     def getMsg(self):
-        payload = self.receiver.receive()
+        try:
+            payload = self.receiver.receive(block=False)
+        except:
+            return
         (payload, payload_type) = payload
         payload = payload.decode("utf-8").split('\x00', 1)[0]
         print(payload)
