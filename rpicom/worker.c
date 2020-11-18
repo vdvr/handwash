@@ -53,11 +53,13 @@ int main() {
 	int pyid = msgget( (key_t)PYTHON_QUEUE_KEY, IPC_CREAT | 0666);
 
         while (1) {
-                int result = rcv_msg(queue, rx_msg, 1);
+
+		/* If message from python UI */
+                int result = rcv_msg( pyid, rx_msg, 1 );
                 if (result != -1) {
                         memset(tx_buffer, 0, sizeof(tx_buffer));
                         serialize(&rx_msg->pkg, &tx_buffer[0]);
-                        send_pkg(fd, tx_buffer);
+                        send_pkg(fd, tx_buffer); // Serial send
                 }
                 if (ioctl (fd, FIONREAD, &num) == -1)
                         break;

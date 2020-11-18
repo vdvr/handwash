@@ -3,9 +3,6 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
-[dev-packages]
-python-magic-bin = "==0.4.14"
-
 [packages]
 pyqt5 = "*"
 pyyaml = "*"
@@ -14,3 +11,6 @@ python-vlc = "*"
 
 [requires]
 python_version = "3.8"
+
+[dev-packages]
+pylint = "*"
