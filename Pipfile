@@ -8,9 +8,10 @@ pyqt5 = "*"
 pyyaml = "*"
 python-magic = "*"
 python-vlc = "*"
+sysv_ipc = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.7"
 
 [dev-packages]
 pylint = "*"
