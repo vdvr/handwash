@@ -12,6 +12,8 @@
 
 #include "serial.h"
 
+/* TODO documentate */
+
 int serial_open(const char *device) {
         struct termios options;
         speed_t myBaud = B9600;
@@ -60,6 +62,7 @@ int serial_get_char(const int fd) {
 	
         return ((int)x) & 0xFF;
 }
+
 void serial_send_char(const int fd, const unsigned char c) {
         write (fd, &c, 1) ;
 }
