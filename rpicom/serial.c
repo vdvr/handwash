@@ -12,6 +12,10 @@
 
 #include "serial.h"
 
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
 /* TODO documentate */
 
 int serial_open(const char *device) {
@@ -60,6 +64,9 @@ int serial_get_char(const int fd) {
         if (read (fd, &x, 1) != 1)
                 return -1;
 	
+	if (DEBUG)
+		printf("[DBG: SERIAL] %c\n", ((int)x & 0xFF));
+
         return ((int)x) & 0xFF;
 }
 

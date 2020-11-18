@@ -11,7 +11,7 @@ worker: worker.o pkghandler.o helper.o serial.o
 	gcc -Werror -Wall -Wextra -o worker worker.o serial.o pkghandler.o helper.o -lzmq
 
 serial.o: serial.h
-	gcc -g -Wall -Wextra -c serial.c
+	gcc -g -Wall -Wextra -c serial.c -DDebug=1
 
 pkghandler.o: pkghandler.c pkg.h serial.o
 	gcc -g -Wall -Wextra -c pkghandler.c
