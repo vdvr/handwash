@@ -93,8 +93,7 @@ int read_until_start(int fd) {
 
 int read_pkg(int fd, char* buff) {
 
-	char c = 0;
-	for (; c != ETX; c = serial_get_char(fd))
+	for (char c = serial_get_char(fd); c != ETX; c = serial_get_char(fd))
 		*buff++ = c;
 
 	/* c needs to be ETX */
