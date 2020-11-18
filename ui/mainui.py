@@ -112,7 +112,7 @@ class MainUI(QMainWindow):
             return
         (payload, payload_type) = payload
         payload = payload.decode("utf-8").split('\x00', 1)[0]
-        print(payload)
+        print("mainui.py:getMsg " + payload)
         if payload:
             payload.split(';')
             cmd = Cmd(payload[0])
