@@ -76,9 +76,6 @@ int deserialize(char* serialized, struct Pkg *pkg) {
 	for (; *serialized != SEP; iteration_count++)
 		*_arguments++ = *serialized++;
 
-	/* Free serialized string */
-	free(serialized);
-
 	/* Everything OK */
 	return 0;
 };
