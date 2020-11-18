@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <termios.h>
 #include <sys/ioctl.h>
-#include <zmq.h>
 
 #include "helper.h"
 #include "pkghandler.h"
