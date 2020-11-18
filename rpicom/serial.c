@@ -60,14 +60,14 @@ int serial_get_char(const int fd) {
         if (read (fd, &x, 1) != 1)
                 return -1;
 
-	x = (int)x && 0xFF;
+	x = (int)x & 0xFF;
 #if DEBUG == 1
 	if (x < 0x30)
 		fprintf(stderr, "[DBG: SERIAL] Unprintable ( less then 0x30 )\n");
 
-	fprintf(stderr, "[DBG: SERIAL] %c\n", ((int)x & 0xFF));
+	fprintf(stderr, "[DBG: SERIAL] %c\n", x));
 #endif
-        return ((int)x) & 0xFF;
+        return x;
 }
 
 void serial_send_char(const int fd, const unsigned char c) {
