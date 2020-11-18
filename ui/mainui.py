@@ -102,7 +102,7 @@ class MainUI(QMainWindow):
 
 
     def getMsg(self):
-        payload = self.receiver.receive()
+        payload = self.receiver.receive(timeout = 0)
         (payload, payload_type) = payload
         payload = payload.decode("utf-8").split('\x00', 1)[0]
         print(payload)

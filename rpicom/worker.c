@@ -29,9 +29,6 @@ int main() {
         char* rxpt;
         rxpt = &rx_buffer[0];
 
-	/* Create a new POSIX message queue */
-        int queue = create_queue();
-
 	/* Create msg structs for IPC messaging */
         struct Msg* rx_msg = (struct Msg*) malloc(sizeof(struct Msg)); 
 	struct Msg tx_msg;
@@ -89,7 +86,7 @@ int main() {
 int read_until_start(int fd) {
 
 	char c = 0;
-	if (c != STX)
+	for (;c != STX;)
 		c = serial_get_char(fd);
 	return 0;
 }

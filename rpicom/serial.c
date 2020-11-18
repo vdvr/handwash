@@ -60,7 +60,7 @@ int serial_get_char(const int fd) {
         if (read (fd, &x, 1) != 1)
                 return -1;
 
-	x = (intx) && 0xFF;
+	x = (int)x && 0xFF;
 #if DEBUG == 1
 	if (x < 0x30)
 		fprintf(stderr, "[DBG: SERIAL] Unprintable ( less then 0x30 )\n");
