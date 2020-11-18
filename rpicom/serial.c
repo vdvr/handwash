@@ -12,10 +12,6 @@
 
 #include "serial.h"
 
-#ifndef DEBUG
-#define DEBUG 0
-#endif
-
 /* TODO documentate */
 
 int serial_open(const char *device) {
@@ -63,11 +59,14 @@ int serial_get_char(const int fd) {
 
         if (read (fd, &x, 1) != 1)
                 return -1;
-	
-	/* print message if wanted */
-	if (DEBUG)
-		fprintf(stderr, "[DBG: SERIAL] %c\n", ((int)x & 0xFF));
 
+	x = (intx) && 0xFF;
+#if DEBUG == 1
+	if (x < 0x30)
+		fprintf(stderr, "[DBG: SERIAL] Unprintable ( less then 0x30 )\n");
+
+	fprintf(stderr, "[DBG: SERIAL] %c\n", ((int)x & 0xFF));
+#endif
         return ((int)x) & 0xFF;
 }
 
