@@ -2,3 +2,6 @@ sudo echo 'ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idPro
 sudo udevadm control --reload-rules && sudo udevadm trigger
 
 make -C rpicom all
+
+sudo apt update
+sudo apt install libvlc-dev python3 python3-pyqt5 python3-pyqt5.qtsvg
