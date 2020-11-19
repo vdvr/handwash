@@ -59,26 +59,21 @@ struct timestamp getTime(void)
     return time_now;
 }
 
-int checkTimeElapsed(struct timestamp time, unsigned int seconds, unsigned int extra) 
+int checkTimeElapsed(struct timestamp time_past, unsigned int seconds, unsigned int extra) 
 {
-    // disable interrupt b
-    unsigned int total_extra, total_seconds,
-                 extra_now, seconds_now_c;
+    unsigned int total_extra, total_seconds;
+    struct timestamp time_now = getTime();
+    
+    total_extra = time_past.extra + extra;
+    total_seconds = time_past.seconds + seconds + (total_extra / TIMER_OF_1HZ);
+    total_extra %= TIMER_OF_1HZ;
 
-    total_seconds = time.seconds + seconds;
-
-    disableTimerIR();
-    extra_now = TCNT1;
-    seconds_now_c = seconds_now;
-    enableTimerIR();
-
-    if (total_seconds < seconds_now_c) 
+    if (total_seconds < time_now.seconds) 
     {
         return 1;
     }
 
-    total_extra = time.extra + extra; // calculate only if needed
-    if ((total_seconds == seconds_now_c) && (total_extra <= extra_now))
+    if ((total_seconds == time_now.seconds) && (total_extra <= time_now.extra))
     {
         return 1;
     }
