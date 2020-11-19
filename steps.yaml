@@ -9,27 +9,27 @@ steps:
       soap: True
   - Handpalmen:
       description: Wrijf de handpalmen tegen elkaar
-      durationS: 15
+      durationS: 5
       displayPath: res/videos/who_3_rub-vp9.webm
   - Gekruist rug:
       description: Wrijf de rechterhandpalm met gekruiste vingers over de linkerhandrug en andersom
-      durationS: 20
+      durationS: 5
       displayPath: res/videos/who_4_dorsal-vp9.webm
   - Gekruist palm:
       description: Wrijf de handpalmen met gekruiste vingers tegen elkaar
-      durationS: 20
+      durationS: 5
       displayPath: res/videos/who_5_cross-vp9.webm
   - Vingers vuist: 
       description: Wrijf je vingers in de vuist van de andere hand
-      durationS: 20
+      durationS: 5
       displayPath: res/videos/who_6_fingers-vp9.webm
   - Duim:
       description: Maak cirkels met je rechterduim in je linkerhand en andersom
-      durationS: 20
+      durationS: 5
       displayPath: res/videos/who_7_thumbs-vp9.webm
   - Palm vingertop:
       description: Maak cirkels met je vingertoppen in je handpalmen
-      durationS: 20
+      durationS: 5
       displayPath: res/videos/who_8_palm-vp9.webm
   - Spoelen:
       description: Spoel de zeep van je handen
@@ -37,7 +37,7 @@ steps:
       water: True
   - Drogen:
       description: Droog je handen met een wegwerpdoekje of handdroger
-      durationS: 15
+      durationS: 5
       displayPath: res/videos/who_10_dry-vp9.webm
 
 startText: Neem water om te beginnen...
