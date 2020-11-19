@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <string.h>
 #include <signal.h>
 #include <sys/poll.h>
@@ -16,6 +17,7 @@
 int read_until_start(int fd);
 int read_pkg(int fd, char* buff);
 int check_pkg(char* rxpt);
+int fd_init(void);
 
 int main() {
 
@@ -28,14 +30,9 @@ int main() {
 
 	/* Create msg structs for IPC messaging */
         struct Msg* rx_msg = (struct Msg*) malloc(sizeof(struct Msg)); 
-	struct Msg tx_msg;
+		struct Msg tx_msg;
 
-	/* Setup the arduino - Needs su! */
-        system("sudo stty -F /dev/arduino -hupcl");
-        system("chmod a+rw /dev/arduino");
-
-	/* Get arduino file descriptor */
-        int fd = serial_open("/dev/arduino");
+		int fd = fd_init();
 
 	/* Flush the data already in buffer */
         tcflush(fd, TCIOFLUSH);
@@ -56,8 +53,9 @@ int main() {
                         serialize(&rx_msg->pkg, &tx_buffer[0]);
                         send_pkg(fd, tx_buffer); // Serial send
                 }
-                if (ioctl (fd, FIONREAD, &num) == -1)
-                        break;
+                if (ioctl (fd, FIONREAD, &num) == -1) {
+					if (errno == EIO) fd = fd_init(); // handle input/output error (EIO)
+				}
                 if (num > 0) {
 
 			/* Wait until start */
@@ -99,4 +97,24 @@ int read_pkg(int fd, char* buff) {
 
 	/* We are done */
 	return 0;
+}
+
+
+int fd_init(void) {
+	int fd;
+
+	do {
+		usleep(50);
+		errno = 0;
+
+		/* Get arduino file descriptor */
+			fd = serial_open("/dev/arduino");
+
+	} while (errno != 0);	// handle file not found error (ENOENT)
+
+	/* Setup the arduino - Needs su! */
+        system("sudo stty -F /dev/arduino -hupcl");
+        system("chmod a+rw /dev/arduino");
+	
+	return fd;
 }
