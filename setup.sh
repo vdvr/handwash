@@ -1,5 +1,3 @@
-sudo apt install libvlc-dev
-
 # disable screen timeout
 sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart > /dev/null <<EOF
 @xset s noblank
