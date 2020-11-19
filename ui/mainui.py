@@ -25,12 +25,6 @@ class MainUI(QMainWindow):
         
         self.setCursor(Qt.BlankCursor)
 
-        send_sock = context.socket(zmq.PUSH)
-        send_sock.connect('tcp://127.0.0.1:5556')
-
-        recv_sock = context.socket(zmq.PULL)
-        recv_sock.connect('tcp://127.0.0.1:5555')
-
         locale.setlocale(locale.LC_TIME, time_locale)
 
         rq = sysv_ipc.MessageQueue(12345, sysv_ipc.IPC_CREAT)
