@@ -25,7 +25,7 @@ app = QApplication(sys.argv)
 for filepath in glob.iglob("fonts/*/*.ttf"):
     QFontDatabase.addApplicationFont(filepath)
 
-mainUI = MainUI(steps, startTxt=yConfig["startText"], styleFile="ui/style.qss", time_locale="nl_BE.utf8")
+mainUI = MainUI(steps, startTxt=yConfig["startText"], styleFile="ui/style.qss", timeLocale="nl_BE.utf8")
 mainUI.show()
 
 sys.exit(app.exec_())

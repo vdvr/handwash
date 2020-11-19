@@ -20,12 +20,12 @@ class Cmd(enum.Enum):
 
 
 class MainUI(QMainWindow):
-    def __init__(self, steps, time_locale=None, startTxt=None, styleFile=None):
+    def __init__(self, steps, timeLocale=None, startTxt=None, styleFile=None):
         super().__init__()
         
         self.setCursor(Qt.BlankCursor)
 
-        locale.setlocale(locale.LC_TIME, time_locale)
+        locale.setlocale(locale.LC_TIME, timeLocale)
 
         rq = sysv_ipc.MessageQueue(12345, sysv_ipc.IPC_CREAT)
         sq = sysv_ipc.MessageQueue(778899, sysv_ipc.IPC_CREAT)
