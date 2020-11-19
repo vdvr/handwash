@@ -9,7 +9,7 @@
 #include "uart.h"
 #include "debug.h"
 
-#define RPI_TIMEOUT_MS 5000			// time to wait for RPI response, high to test
+#define RPI_TIMEOUT_MS 500			// time to wait for RPI response, high to test
 #define POLL_TIMEOUT_S 10			// time after last action to send POLL request, low to test
 
 // ---------------------------------------
@@ -55,8 +55,6 @@ int main(void)
 {
 	sei();
 
-	//debug_port_setup();
-
 	peripheral_setup();
 	uartSetup(9600);
 	timerSetup();
@@ -68,10 +66,6 @@ int main(void)
 
 	for (;;)
 	{
-
-		//if(debug_port_read(0)) pkg_construct("water","");
-
-
 		if (is_faucet_sensor_set())			// checks if object detected at faucet sensor, copy body for external interrupt
 		{
 			//debug_sendString("faucet detected");
