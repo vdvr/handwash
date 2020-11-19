@@ -12,9 +12,11 @@
 
 #include "serial.h"
 
+/* TODO documentate */
+
 int serial_open(const char *device) {
         struct termios options;
-        speed_t myBaud = B57600;
+        speed_t myBaud = B9600;
         int     status, fd;
 
         if ((fd = open (device, O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK)) == -1)
@@ -58,8 +60,16 @@ int serial_get_char(const int fd) {
         if (read (fd, &x, 1) != 1)
                 return -1;
 
-        return ((int)x) & 0xFF;
+	x = (int)x & 0xFF;
+#if DEBUG == 1
+	if (x < 0x30)
+		fprintf(stderr, "[DBG: SERIAL] %X\n", x);
+
+	fprintf(stderr, "[DBG: SERIAL] %X\n", x);
+#endif
+        return x;
 }
+
 void serial_send_char(const int fd, const unsigned char c) {
         write (fd, &c, 1) ;
 }

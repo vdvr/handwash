@@ -1,7 +1,8 @@
 from . import StepUI, IdleUI
 import enum
-import zmq
-import codecs
+import locale
+import sysv_ipc
+
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 from PyQt5.QtWidgets import (
     QMainWindow
@@ -10,21 +11,19 @@ from PyQt5.QtWidgets import (
 class Cmd(enum.Enum):
     ACK = 0x20
     NACK = 0x21
-    POLL_REQUEST = '0'
-    POLL_REPLY = '1'
-    REQ_WATER = '2'
-    REQ_SOAP = '3'
-    WATER_DONE = '4'
-    SOAP_DONE = '5'
+    POLL_REQUEST = 0x30
+    POLL_REPLY = 0x31
+    REQ_WATER = 0x32
+    REQ_SOAP = 0x33
+    WATER_DONE = 0x34
+    SOAP_DONE = 0x35
 
 
 class MainUI(QMainWindow):
-    def __init__(self, steps, startTxt=None, styleFile=None):
+    def __init__(self, steps, time_locale=None, startTxt=None, styleFile=None):
         super().__init__()
         
         self.setCursor(Qt.BlankCursor)
-
-        context = zmq.Context()
 
         send_sock = context.socket(zmq.PUSH)
         send_sock.connect('tcp://127.0.0.1:5556')
@@ -32,8 +31,13 @@ class MainUI(QMainWindow):
         recv_sock = context.socket(zmq.PULL)
         recv_sock.connect('tcp://127.0.0.1:5555')
 
-        self.sender = send_sock
-        self.receiver = recv_sock
+        locale.setlocale(locale.LC_TIME, time_locale)
+
+        rq = sysv_ipc.MessageQueue(12345, sysv_ipc.IPC_CREAT)
+        sq = sysv_ipc.MessageQueue(778899, sysv_ipc.IPC_CREAT)
+
+        self.sender = sq
+        self.receiver = rq
 
         if styleFile != None:
             with open(styleFile) as styleFileObj:
@@ -76,6 +80,10 @@ class MainUI(QMainWindow):
             
         cmd = msg["cmd"]
 
+        if cmd == Cmd["POLL_REQUEST"]:
+            self.sendMsg(Cmd["POLL_REPLY"], "")
+            return
+
         if not self.isStarted:
             if (cmd == Cmd["REQ_WATER"] and self.steps[0].water or
                 cmd == Cmd["REQ_SOAP"] and self.steps[0].soap):
@@ -103,14 +111,20 @@ class MainUI(QMainWindow):
 
 
     def sendMsg(self, cmd, args):
-        payload = str(cmd.value) + ';' + args
-        self.sender.send_string(payload)
+        payload = chr(cmd.value) + ';' + args
+        print("mainui.py:sendMsg " + payload)
+        self.sender.send(payload, True, type=1)
 
 
     def getMsg(self):
-        payload = self.receiver.recv_string()
+        try:
+            payload = self.receiver.receive(block=False)
+        except:
+            return
+        (payload, payload_type) = payload
+        payload = payload.decode("utf-8").split('\x00', 1)[0]
+        print("mainui.py:getMsg " + payload)
         if payload:
             payload.split(';')
-            print(payload[0])
-            cmd = Cmd(payload[0])
+            cmd = Cmd(ord(payload[0]))
             return {"cmd": cmd, "args": payload[1:]}

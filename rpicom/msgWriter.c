@@ -14,9 +14,7 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	} else {
 		int queue;
-		key_t key;
-		key = generate_key();
-		queue = create_queue(key);
+		queue = create_queue();
 
 		struct Msg* msg_to_send = (struct Msg*) malloc(sizeof(struct Msg));
 		msg_to_send->type = 1;

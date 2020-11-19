@@ -1,12 +1,17 @@
-# Install
-Install python 3.8.x  
-Then run:  
-    `git clone https://github.com/vdvr/handwash`  
-    `pip install pipenv`  
-    Spawn environment shell:
-    `pipenv shell`
-    Run after each pull:  
-    `pipenv install --dev`  
-      
-# Add dependency
-`pipenv install <package>`  
+# Setup
+Clone this repository, eg: `git clone https://github.com/vdvr/handwash`.
+
+## Python - aka UI - setup
+Make sure you have python version 3.8 installed, check with `python -V` or
+`python3 -V`. Note that when you use the command python3 you also need to use
+pip3 (and not pip).
+
+## Install and use pipenv
+``` bash
+pip3 install pipenv
+pipenv install --dev
+pipenv shell
+```
+
+# Developer notes
+To add python dependencies use `pipenv install <pypi package>`.

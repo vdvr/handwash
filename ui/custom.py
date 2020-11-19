@@ -2,7 +2,7 @@ from datetime import datetime
 import magic
 import platform
 import vlc
-from PyQt5.QtCore import Qt, pyqtSlot, QTimer, QUrl
+from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtSvg import QGraphicsSvgItem
 from PyQt5.QtWidgets import (
@@ -42,13 +42,12 @@ class MediaView(QGraphicsView):
             mediaItem = QGraphicsPixmapItem(QPixmap(filePath))
 
         elif fileMime in self._allowedVideoMime:
-            
             self.media = self.instance.media_new(filePath)
             self.mediaplayer.set_media(self.media)
 
             if platform.system() == "Linux":
                 self.mediaplayer.set_xwindow(int(self.winId()))
-            elif platform.system() == "Windows":
+            elif platform.system() == "Windows":    
                 self.mediaplayer.set_hwnd(int(self.winId()))
             
             self.mediaplayer.play()
@@ -76,15 +75,12 @@ class MediaView(QGraphicsView):
     def _allowedVideoMime(self):
         return [
             "video/mp4",
+            "video/webm",
             "video/quicktime",
             "video/x-msvideo",
-            "video/mpeg"
+            "video/mpeg",
         ]
 
-    
-    @pyqtSlot()
-    def _startVideo(self):
-        self.videoPlayer.play()
 
 
 
@@ -93,7 +89,7 @@ class DateTimeWidget(QWidget):
         super().__init__()
 
         # Initialize current time and date label and add to layout
-        dateNow = datetime.strftime(datetime.now(), "%A %d %B")
+        dateNow = datetime.strftime(datetime.now(), "%A %d %B").capitalize()
         timeNow = datetime.strftime(datetime.now(), "%H:%M")
 
         self.dateTimeLayout = QVBoxLayout()
@@ -122,7 +118,7 @@ class DateTimeWidget(QWidget):
     def _updateClock(self):
         
         # Set current time
-        dateNow = datetime.strftime(datetime.now(), "%A %d %B")
+        dateNow = datetime.strftime(datetime.now(), "%A %d %B").capitalize()
         timeNow = datetime.strftime(datetime.now(), "%H:%M")
         self.dateLbl.setText(dateNow)
         self.timeLbl.setText(timeNow)

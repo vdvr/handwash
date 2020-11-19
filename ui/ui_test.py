@@ -3,7 +3,6 @@ import locale
 import yaml
 import glob
 from PyQt5.QtWidgets import QApplication
-from gpiozero import LED
 from time import sleep
 
 from . import (
