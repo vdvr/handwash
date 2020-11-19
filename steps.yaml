@@ -1,3 +1,5 @@
+startText: Steek je handen onder de kraan om te beginnen...
+
 steps:
   - Nat maken:
       description: Maak je handen nat
@@ -39,5 +41,3 @@ steps:
       description: Droog je handen met een wegwerpdoekje of handdroger
       durationS: 5
       displayPath: res/videos/who_10_dry-vp9.webm
-
-startText: Steek je handen onder de kraan om te beginnen...
