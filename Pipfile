@@ -7,8 +7,8 @@ verify_ssl = true
 pyyaml = "*"
 python-magic = "*"
 python-vlc = "*"
-zmq = "*"
-pyserial-asyncio = "*"
+sysv-ipc = "*"
+pyserial = "*"
 
 [requires]
 python_version = "3.7"
