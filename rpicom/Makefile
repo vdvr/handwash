@@ -8,7 +8,7 @@ helper.o: helper.c msg.h helper.h pkghandler.h
 	gcc -g -Wall -Wextra -c helper.c
 
 worker: worker.o pkghandler.o helper.o serial.o
-	gcc -Werror -Wall -Wextra -o worker worker.o serial.o pkghandler.o helper.o -lzmq
+	gcc -Werror -Wall -Wextra -o worker worker.o serial.o pkghandler.o helper.o
 
 serial.o: serial.h
 	gcc -g -Wall -Wextra -c serial.c -DDEBUG=1
