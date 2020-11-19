@@ -20,7 +20,7 @@ int wait_rec_msg(int ms, int affermative, int negative)
     while (1)
     {
         secs = ms / 1000;
-        extra = (ms % 1000) * TIMER_OF_1HZ / 1000;
+        extra = ((ms % 1000) * TIMER_OF_1HZ) / 1000;
         while ((new_pkg == 0) && !checkTimeElapsed(time, secs, extra));
 
 

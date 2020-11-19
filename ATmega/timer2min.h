@@ -1,7 +1,7 @@
 #ifndef TIMER2MIN_H_
 #define TIMER2MIN_H_
 
-#define TIMER_OF_1HZ 15624
+#define TIMER_OF_1HZ 15624UL
 
 struct timestamp {
     unsigned int seconds;
