@@ -1,5 +1,4 @@
 import sys
-import locale
 import yaml
 import glob
 from PyQt5.QtWidgets import QApplication
@@ -8,8 +7,6 @@ from ui import (
     MainUI,
 )
 from PyQt5.QtGui import QFontDatabase
-
-locale.setlocale(locale.LC_TIME, "nl_BE")
 
 with open('steps.yaml') as f:
     yConfig = yaml.safe_load(f)
@@ -28,7 +25,7 @@ app = QApplication(sys.argv)
 for filepath in glob.iglob("fonts/*/*.ttf"):
     QFontDatabase.addApplicationFont(filepath)
 
-mainUI = MainUI(steps, startTxt=yConfig["startText"], styleFile="ui/style.qss")
+mainUI = MainUI(steps, startTxt=yConfig["startText"], styleFile="ui/style.qss", time_locale="nl_BE.utf8")
 mainUI.show()
 
 sys.exit(app.exec_())

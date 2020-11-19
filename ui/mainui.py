@@ -1,7 +1,7 @@
 from . import StepUI, IdleUI
 import enum
+import locale
 import sysv_ipc
-import codecs
 
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 from PyQt5.QtWidgets import (
@@ -20,8 +20,10 @@ class Cmd(enum.Enum):
 
 
 class MainUI(QMainWindow):
-    def __init__(self, steps, startTxt=None, styleFile=None):
+    def __init__(self, steps, time_locale=None, startTxt=None, styleFile=None):
         super().__init__()
+
+        locale.setlocale(locale.LC_TIME, time_locale)
 
         rq = sysv_ipc.MessageQueue(12345, sysv_ipc.IPC_CREAT)
         sq = sysv_ipc.MessageQueue(778899, sysv_ipc.IPC_CREAT)

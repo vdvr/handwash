@@ -89,7 +89,7 @@ class DateTimeWidget(QWidget):
         super().__init__()
 
         # Initialize current time and date label and add to layout
-        dateNow = datetime.strftime(datetime.now(), "%A %d %B")
+        dateNow = datetime.strftime(datetime.now(), "%A %d %B").capitalize()
         timeNow = datetime.strftime(datetime.now(), "%H:%M")
 
         self.dateTimeLayout = QVBoxLayout()
@@ -118,7 +118,7 @@ class DateTimeWidget(QWidget):
     def _updateClock(self):
         
         # Set current time
-        dateNow = datetime.strftime(datetime.now(), "%A %d %B")
+        dateNow = datetime.strftime(datetime.now(), "%A %d %B").capitalize()
         timeNow = datetime.strftime(datetime.now(), "%H:%M")
         self.dateLbl.setText(dateNow)
         self.timeLbl.setText(timeNow)
