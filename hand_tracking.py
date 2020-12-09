@@ -15,6 +15,11 @@ MIN_DETECTION_CONFIDENCE = 0.7
 MIN_TRACKING_CONFIDENCE = 0.5
 
 
+def set_opacity(image, opacity):
+    image[:, :, 3] = cv.multiply(image[:, :, 3], opacity)
+    return image
+    
+
 def rotate_img_uncropped(image, angle):
     # get rotation matrix
     rows, cols = image.shape[:2]
