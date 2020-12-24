@@ -25,6 +25,8 @@ OPACITY_DECR_ODD = .01
 MIN_DETECTION_CONFIDENCE = .7
 MIN_TRACKING_CONFIDENCE = .5
 
+HAND_LABELS = ("Left", "Right")
+
 
 def set_opacity(image, opacity):
     image[:, :, 3] = cv.multiply(image[:, :, 3], opacity)
@@ -92,26 +94,12 @@ def add_image_with_alpha(bottom_img, top_img, center_pos, opacity):
 def draw_microbe_on_hand(image, microbe_img, landmark_result, microbe_data):
     img_rows, img_cols = image.shape[:2]
 
-    # get hand index and return if hand not detected
-    hand_name = microbe["hand_name"]
-    try:
-        hand_i = next(
-            i
-            for i, hand in enumerate(landmark_result.multi_handedness)
-            if hand.classification[0].label[:-1] == hand_name
-        )
-    except StopIteration:
-        return image
-
-    if (len(landmark_result.multi_handedness) == 1):
-        hand_i = 0
-
     # get coordinates on image axis
-    landmark_ai = microbe["pos"]["connection"][0].value
-    landmark_bi = microbe["pos"]["connection"][1].value
+    landmark_ai = microbe_data["pos"]["connection"][0].value
+    landmark_bi = microbe_data["pos"]["connection"][1].value
     
-    landmark_an = landmark_result.multi_hand_landmarks[hand_i].landmark[landmark_ai]
-    landmark_bn = landmark_result.multi_hand_landmarks[hand_i].landmark[landmark_bi]
+    landmark_an = landmark_result.landmark[landmark_ai]
+    landmark_bn = landmark_result.landmark[landmark_bi]
 
     landmark_dx = landmark_bn.x - landmark_an.x
     landmark_dy = landmark_bn.y - landmark_an.y
@@ -120,11 +108,11 @@ def draw_microbe_on_hand(image, microbe_img, landmark_result, microbe_data):
     angle = -1 * math.degrees(
         math.atan2(landmark_dy, landmark_dx)
     )
-    angle = angle + microbe["pos"]["angle"]
+    angle = angle + microbe_data["pos"]["angle"]
     rot_microbe_img = rotate_img_uncropped(microbe_img, angle)
 
-    center_x = landmark_dx * microbe["pos"]["distance_n"] + landmark_an.x
-    center_y = landmark_dy * microbe["pos"]["distance_n"] + landmark_an.y
+    center_x = landmark_dx * microbe_data["pos"]["distance_n"] + landmark_an.x
+    center_y = landmark_dy * microbe_data["pos"]["distance_n"] + landmark_an.y
 
     center = (
         int(center_x * img_cols),
@@ -147,7 +135,7 @@ back_sub = cv.createBackgroundSubtractorMOG2(history=HISTORY, varThreshold=MOG2_
 
 
 # load microbe images
-possible_locations = list(itertools.product(("Left", "Right"), mp_hands.HAND_CONNECTIONS))
+possible_locations = list(itertools.product(HAND_LABELS, mp_hands.HAND_CONNECTIONS))
 microbe_files = list(glob.glob("res/microbes/*"))
 microbes_n = random.randint(
     min(MICROBE_MIN_AMOUNT, len(possible_locations)), 
@@ -160,11 +148,14 @@ microbe_imgs = [
 ]
 
 # initialization of a list of microbes with a defined position, angle and size
-microbe_data = []
+microbe_data = {
+    hand: list()
+    for hand in HAND_LABELS
+}
 
 for _ in range(microbes_n):
     loc_i = random.randrange(len(possible_locations))
-    conn_loc = possible_locations[loc_i]
+    hand, conn_loc = possible_locations[loc_i]
     possible_locations.pop(loc_i)
 
     img_nr = random.randint(0, len(microbe_imgs) - 1)
@@ -172,11 +163,11 @@ for _ in range(microbes_n):
     height = MICROBE_MIN_HEIGHT + random.randint(0, MICROBE_MAX_HEIGHT - MICROBE_MIN_HEIGHT)
     width = int(height / init_height * init_width)
 
-    microbe_data.append(
+    microbe_data[hand].append(
         {
             "pos":
             {
-                "connection": conn_loc[1],
+                "connection": conn_loc,
                 "distance_n": random.randint(100, 900) / 1000.0,
                 "angle": random.randint(0, 359),
             },
@@ -186,7 +177,6 @@ for _ in range(microbes_n):
                 "height": height,
             },
             "opacity": 1,
-            "hand_name": conn_loc[0],
             "image_nr": random.randint(0, len(microbe_imgs) - 1),
         }
     )
@@ -212,46 +202,62 @@ while cap.isOpened():
         cv.flip(image, 1),
         cv.COLOR_BGR2RGB
     )
-
-    # create motion mask with background substraction
-    motion_mask = back_sub.apply(image)
-
+    
     # detect nodes (joints and palm)
     results = hands.process(image)
 
-    # convert image back to native opencv BGR, TODO: remove in production if displayed in Qt
-    image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
-
-    # decrease opacity
-    for i, hand in enumerate(microbe_data):
-        if hand["opacity"] <= 0:
-            microbe_data.pop(i)
-        elif (hand["opacity"] < 1) or (random.random() <= OPACITY_DECR_ODD):
-            hand["opacity"] -= OPACITY_DECR
-
-    # resize and draw microbes on image on connections
+    # create motion mask with background substraction
+    motion_mask = back_sub.apply(image)
+    motion_loc = None
     if results.multi_hand_landmarks:
-        for microbe in microbe_data:
-            microbe_img = microbe_imgs[microbe["image_nr"]]
-            microbe_img = cv.resize(microbe_img, (microbe["size"]["width"], microbe["size"]["width"]))
-            image = draw_microbe_on_hand(image, microbe_img, results, microbe)
-    else: 
-        # mask noise reduction with median blur
+        # motion mask noise reduction with median blur
         motion_mask = cv.medianBlur(
             motion_mask,
             MASK_NOISE_BLUR_RAD
         )
-        
-        # draw microbes on random locations on motion
-        motion_loc = np.where(motion_mask >= 127)
-        
-        if len(motion_loc[0] > 0):
-            motion_loc = list(zip(motion_loc[1], motion_loc[0]))
 
-            for microbe in microbe_data:
+    # convert image back to native opencv BGR, TODO: remove in production if displayed in Qt
+    image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
+
+    for hand_name in HAND_LABELS:
+        # try to get hand index
+        if results.multi_hand_landmarks:
+            try:
+                hand_i = next(
+                    i
+                    for i, hand in enumerate(results.multi_handedness)
+                    if hand.classification[0].label[:-1] == hand_name
+                )
+            except StopIteration:
+                hand_i = None
+        else: 
+            hand_i = None
+
+        
+        # decrease opacity
+        for i, microbe in enumerate(microbe_data[hand]):
+            if microbe["opacity"] <= 0:
+                microbe_data[hand].pop(i)
+            elif (microbe["opacity"] < 1) or (random.random() <= OPACITY_DECR_ODD):
+                microbe["opacity"] -= OPACITY_DECR
+
+            # resize image
+            microbe_img = microbe_imgs[microbe["image_nr"]]
+            microbe_img = cv.resize(microbe_img, (microbe["size"]["width"], microbe["size"]["width"]))
+
+            if hand_i != None:
+                landmark_result = results.multi_hand_landmarks[hand_i]
+                image = draw_microbe_on_hand(image, microbe_img, landmark_result, microbe)
+    
+            else:         
+                # draw microbes on random locations on motion
+                if motion_loc == None:
+                    motion_loc = np.where(motion_mask >= 127)
+                    
+                    if len(motion_loc[0] > 0):
+                        motion_loc = list(zip(motion_loc[1], motion_loc[0]))
+
                 pos = random.choice(motion_loc)
-                microbe_img = microbe_imgs[microbe["image_nr"]]
-                microbe_img = cv.resize(microbe_img, (microbe["size"]["width"], microbe["size"]["width"]))
                 image = add_image_with_alpha(image, microbe_img, pos, microbe["opacity"])
         
 
@@ -259,6 +265,7 @@ while cap.isOpened():
     cv.imshow('Microbes', image)
     if cv.waitKey(5) & 0xFF == 27:
         break
+
 
 # exit gracefully
 hands.close()
