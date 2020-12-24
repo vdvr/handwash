@@ -11,8 +11,11 @@ MICROBE_MAX_HEIGHT = 50
 MICROBE_MIN_AMOUNT = 10
 MICROBE_MAX_AMOUNT = 15
 
-MIN_DETECTION_CONFIDENCE = 0.7
-MIN_TRACKING_CONFIDENCE = 0.5
+OPACITY_DECR = .05
+OPACITY_DECR_ODD = .01
+
+MIN_DETECTION_CONFIDENCE = .7
+MIN_TRACKING_CONFIDENCE = .5
 
 
 def set_opacity(image, opacity):
@@ -44,7 +47,10 @@ def resize_img_hand_distance(image, landmark_result, base_height, scale=1):
     pass
 
 
-def add_image_with_alpha(bottom_img, top_img, center_pos):
+def add_image_with_alpha(bottom_img, top_img, center_pos, opacity):
+    # apply opacity
+    if opacity < 1:
+        top_img = set_opacity(top_img, opacity)
 
     # get image shapes and center coordinates
     t_c_x, t_c_y = center_pos
@@ -79,7 +85,7 @@ def draw_microbe_on_hand(image, microbe_img, landmark_result, microbe_data):
     img_rows, img_cols = image.shape[:2]
 
     # get hand index and return if hand not detected
-    hand_name = microbe["pos"]["hand_name"]
+    hand_name = microbe["hand_name"]
     try:
         hand_i = next(
             i
@@ -109,9 +115,6 @@ def draw_microbe_on_hand(image, microbe_img, landmark_result, microbe_data):
     angle = angle + microbe["pos"]["angle"]
     rot_microbe_img = rotate_img_uncropped(microbe_img, angle)
 
-    #if landmark.visibility < 0 or landmark.presence < 0:
-    #    return image
-
     center_x = landmark_dx * microbe["pos"]["distance_n"] + landmark_an.x
     center_y = landmark_dy * microbe["pos"]["distance_n"] + landmark_an.y
 
@@ -123,7 +126,7 @@ def draw_microbe_on_hand(image, microbe_img, landmark_result, microbe_data):
     #microbe["image"] = resize_img_hand_distance(microbe_img, results, MICROBE_BASE_HEIGHT, scale=1)
     
     # add microbe image to base image
-    return add_image_with_alpha(image, rot_microbe_img, center)
+    return add_image_with_alpha(image, rot_microbe_img, center, microbe_data["opacity"])
 
 
 mp_drawing = mp.solutions.drawing_utils
@@ -147,10 +150,11 @@ microbe_data = [
             "connection": random.sample(mp_hands.HAND_CONNECTIONS, 1)[0],
             "distance_n": random.randint(100, 900) / 1000.0,
             "angle": random.randint(0, 359),
-            "hand_name": random.choice(("Left", "Right")),
         },
         "size": dict(),
-        "image_nr": random.randint(0, len(microbe_imgs) - 1)
+        "opacity": 1,
+        "hand_name": random.choice(("Left", "Right")),
+        "image_nr": random.randint(0, len(microbe_imgs) - 1),
     }
     for _ in range(microbes_n)
 ]
@@ -187,6 +191,13 @@ while cap.isOpened():
 
     # convert image back to native opencv BGR
     image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
+
+    # decrease opacity
+    for i, hand in enumerate(microbe_data):
+        if hand["opacity"] <= 0:
+            microbe_data.pop(i)
+        elif (hand["opacity"] < 1) or (random.random() <= OPACITY_DECR_ODD):
+            hand["opacity"] -= OPACITY_DECR
 
     # resize and draw microbes on image
     if results.multi_hand_landmarks:
