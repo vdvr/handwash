@@ -155,6 +155,11 @@ for _ in range(microbes_n):
     conn_loc = possible_locations[loc_i]
     possible_locations.pop(loc_i)
 
+    img_nr = random.randint(0, len(microbe_imgs) - 1)
+    init_height, init_width = microbe_imgs[img_nr].shape[:2]
+    height = MICROBE_MIN_HEIGHT + random.randint(0, MICROBE_MAX_HEIGHT - MICROBE_MIN_HEIGHT)
+    width = int(height / init_height * init_width)
+
     microbe_data.append(
         {
             "pos":
@@ -163,35 +168,16 @@ for _ in range(microbes_n):
                 "distance_n": random.randint(100, 900) / 1000.0,
                 "angle": random.randint(0, 359),
             },
-            "size": dict(),
+            "size": 
+            {
+                "width": width,
+                "height": height,
+            },
             "opacity": 1,
             "hand_name": conn_loc[0],
             "image_nr": random.randint(0, len(microbe_imgs) - 1),
         }
     )
-
-microbe_data = [
-    {
-        "pos":
-        {
-            "connection": random.sample(mp_hands.HAND_CONNECTIONS, 1)[0],
-            "distance_n": random.randint(100, 900) / 1000.0,
-            "angle": random.randint(0, 359),
-            "prev_x": None,
-            "prev_y": None,
-        },
-        "size": dict(),
-        "opacity": 1,
-        "hand_name": random.choice(("Left", "Right")),
-        "image_nr": random.randint(0, len(microbe_imgs) - 1),
-    }
-    for _ in range(microbes_n)
-]
-
-for microbe in microbe_data:
-    init_height, init_width = microbe_imgs[microbe["image_nr"]].shape[:2]
-    microbe["size"]["height"] = MICROBE_MIN_HEIGHT + random.randint(0, MICROBE_MAX_HEIGHT - MICROBE_MIN_HEIGHT)
-    microbe["size"]["width"] = int(microbe["size"]["height"] / init_height * init_width)
 
 # initialize model for hand detection
 hands = mp_hands.Hands(
