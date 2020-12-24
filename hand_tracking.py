@@ -4,6 +4,7 @@ import numpy as np
 import glob
 import random
 import math
+import itertools
 
 
 MICROBE_MIN_HEIGHT = 30
@@ -134,15 +135,41 @@ mp_hands = mp.solutions.hands
 
 
 # load microbe images
-microbes = list(glob.glob("res/microbes/*"))
-microbes_n = random.randint(MICROBE_MIN_AMOUNT, MICROBE_MAX_AMOUNT)
+possible_locations = list(itertools.product(("Left", "Right"), mp_hands.HAND_CONNECTIONS))
+microbe_files = list(glob.glob("res/microbes/*"))
+microbes_n = random.randint(
+    min(MICROBE_MIN_AMOUNT, len(possible_locations)), 
+    min(MICROBE_MAX_AMOUNT, len(possible_locations))
+)
 
 microbe_imgs = [
-    cv.imread(microbe, cv.IMREAD_UNCHANGED)
-    for microbe in microbes
+    cv.imread(microbe_f, cv.IMREAD_UNCHANGED)
+    for microbe_f in microbe_files
 ]
 
 # initialize of a set of microbes at set positions
+microbe_data = []
+
+for _ in range(microbes_n):
+    loc_i = random.randrange(len(possible_locations))
+    conn_loc = possible_locations[loc_i]
+    possible_locations.pop(loc_i)
+
+    microbe_data.append(
+        {
+            "pos":
+            {
+                "connection": conn_loc[1],
+                "distance_n": random.randint(100, 900) / 1000.0,
+                "angle": random.randint(0, 359),
+            },
+            "size": dict(),
+            "opacity": 1,
+            "hand_name": conn_loc[0],
+            "image_nr": random.randint(0, len(microbe_imgs) - 1),
+        }
+    )
+
 microbe_data = [
     {
         "pos":
@@ -150,6 +177,8 @@ microbe_data = [
             "connection": random.sample(mp_hands.HAND_CONNECTIONS, 1)[0],
             "distance_n": random.randint(100, 900) / 1000.0,
             "angle": random.randint(0, 359),
+            "prev_x": None,
+            "prev_y": None,
         },
         "size": dict(),
         "opacity": 1,
