@@ -7,6 +7,13 @@ import math
 import itertools
 
 
+# parameters
+HISTORY = 2
+MOG2_THRESHOLD = 11
+KNN_THRESHOLD = 500
+
+MASK_NOISE_BLUR_RAD = 9
+
 MICROBE_MIN_HEIGHT = 30
 MICROBE_MAX_HEIGHT = 50
 MICROBE_MIN_AMOUNT = 10
@@ -134,6 +141,11 @@ mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
 
+# initialize background subtractor
+back_sub = cv.createBackgroundSubtractorMOG2(history=HISTORY, varThreshold=MOG2_THRESHOLD)
+#back_sub = cv.createBackgroundSubtractorKNN(history=HISTORY, dist2Threshold=KNN_THRESHOLD)
+
+
 # load microbe images
 possible_locations = list(itertools.product(("Left", "Right"), mp_hands.HAND_CONNECTIONS))
 microbe_files = list(glob.glob("res/microbes/*"))
@@ -147,7 +159,7 @@ microbe_imgs = [
     for microbe_f in microbe_files
 ]
 
-# initialize of a set of microbes at set positions
+# initialization of a list of microbes with a defined position, angle and size
 microbe_data = []
 
 for _ in range(microbes_n):
@@ -201,10 +213,13 @@ while cap.isOpened():
         cv.COLOR_BGR2RGB
     )
 
+    # create motion mask with background substraction
+    motion_mask = back_sub.apply(image)
+
     # detect nodes (joints and palm)
     results = hands.process(image)
 
-    # convert image back to native opencv BGR
+    # convert image back to native opencv BGR, TODO: remove in production if displayed in Qt
     image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
 
     # decrease opacity
@@ -214,12 +229,31 @@ while cap.isOpened():
         elif (hand["opacity"] < 1) or (random.random() <= OPACITY_DECR_ODD):
             hand["opacity"] -= OPACITY_DECR
 
-    # resize and draw microbes on image
+    # resize and draw microbes on image on connections
     if results.multi_hand_landmarks:
         for microbe in microbe_data:
             microbe_img = microbe_imgs[microbe["image_nr"]]
             microbe_img = cv.resize(microbe_img, (microbe["size"]["width"], microbe["size"]["width"]))
             image = draw_microbe_on_hand(image, microbe_img, results, microbe)
+    else: 
+        # mask noise reduction with median blur
+        motion_mask = cv.medianBlur(
+            motion_mask,
+            MASK_NOISE_BLUR_RAD
+        )
+        
+        # draw microbes on random locations on motion
+        motion_loc = np.where(motion_mask >= 127)
+        
+        if len(motion_loc[0] > 0):
+            motion_loc = list(zip(motion_loc[1], motion_loc[0]))
+
+            for microbe in microbe_data:
+                pos = random.choice(motion_loc)
+                microbe_img = microbe_imgs[microbe["image_nr"]]
+                microbe_img = cv.resize(microbe_img, (microbe["size"]["width"], microbe["size"]["width"]))
+                image = add_image_with_alpha(image, microbe_img, pos, microbe["opacity"])
+        
 
     # show image and close window with ESC
     cv.imshow('Microbes', image)
