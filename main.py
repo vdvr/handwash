@@ -22,7 +22,7 @@ steps = [
 
 app = QApplication(sys.argv)
 
-for filepath in glob.iglob("fonts/*/*.ttf"):
+for filepath in glob.iglob("res/fonts/*/*.ttf"):
     QFontDatabase.addApplicationFont(filepath)
 
 mainUI = MainUI(steps, startTxt=yConfig["startText"], styleFile="ui/style.qss", timeLocale="nl_BE.utf8")
