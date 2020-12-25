@@ -2,7 +2,6 @@ from . import StepUI, IdleUI
 import enum
 import locale
 import sysv_ipc
-
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 from PyQt5.QtWidgets import (
     QMainWindow
@@ -20,7 +19,7 @@ class Cmd(enum.Enum):
 
 
 class MainUI(QMainWindow):
-    def __init__(self, steps, timeLocale=None, startTxt=None, styleFile=None):
+    def __init__(self, steps, timeLocale=None, startTxt=None, styleFile=None, usingAR=True, microbeRes="res/microbes"):
         super().__init__()
         
         self.setCursor(Qt.BlankCursor)

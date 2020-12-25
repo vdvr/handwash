@@ -12,12 +12,6 @@ from . import (
 )
 from PyQt5.QtGui import QFontDatabase
 
-tap_signal = Button(17)
-
-while True:
-    
-    tap_signal.when_pressed = start_handwash()
-
 
 if __name__ == "__main__":
     locale.setlocale(locale.LC_TIME, "nl_BE")

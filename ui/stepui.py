@@ -1,9 +1,12 @@
 from . import DateTimeWidget, MediaView
+from microbe_ar import MicrobeARObj
+from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import (
     Qt, 
     pyqtSignal,
     pyqtSlot,
     QTimer,
+    QThread,
 )
 from PyQt5.QtWidgets import (
     QWidget,
@@ -12,12 +15,13 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
 )
 
+DIM = (640, 480)
 
 
 class StepUI(QWidget):
     finished = pyqtSignal()
 
-    def __init__(self, steps, styleFile=None):
+    def __init__(self, steps, styleFile=None, usingAR=True, microbeRes="res/microbes"):
         super().__init__()
         
         # Initialize properties
@@ -38,10 +42,18 @@ class StepUI(QWidget):
 
         # Add layouts, step photo and description to main layout
         self.mainLayout.addLayout(self.topLayout, 2)
-
+        
         self.mediaView = MediaView()
-        self.mediaView.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.mainLayout.addWidget(self.mediaView, 6)
+
+        self.usingAR = usingAR
+        if usingAR:
+            self.videoFeed = QLabel()
+            self.videoFeed.resize(*DIM)
+            self.videoFeed.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.mainLayout.addWidget(self.videoFeed, 6)
+        else:
+            self.mainLayout.addWidget(self.mediaView, 6)
+            self.mediaView.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
         self.stepDescLbl = QLabel()
         self.stepDescLbl.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
@@ -70,8 +82,20 @@ class StepUI(QWidget):
         self.stepLayout.setSpacing(0)
         self.topLayout.addLayout(self.stepLayout)
 
+        if usingAR:
+            self.mediaView.setAlignment(Qt.AlignLeft)
+            self.bottomLayout.addWidget(self.mediaView)
         self.dateTime = DateTimeWidget(main=False)
         self.bottomLayout.addWidget(self.dateTime)
+
+        if usingAR:
+            self.microbeThread = QThread()
+            self.microbeObj = MicrobeARObj(microbeRes, self.totalSteps)
+            self.microbeObj.moveToThread(self.microbeThread)
+            self.microbeThread.started.connect(self.microbeObj.startRunning)
+            self.finished.connect(self.microbeThread.quit)
+            self.microbeObj.newFrameAvail.connect(self.updateVideoFeed)
+            self.microbeThread.start()
 
         # Start showing steps
         self.nextStep()
@@ -110,6 +134,9 @@ class StepUI(QWidget):
 
         self.stepQueue.pop(0)
 
+        if self.usingAR:
+            self.microbeObj.delMicrobe()
+
 
     @pyqtSlot()
     def _decreaseDuration(self):
@@ -122,6 +149,11 @@ class StepUI(QWidget):
 
         else:
             self.timeLeftLbl.setText(f"{durationS - 1} s")
+
+    
+    @pyqtSlot(QImage)
+    def updateVideoFeed(self, image):
+        self.videoFeed.setPixmap(QPixmap.fromImage(image))
 
 
     def show(self):

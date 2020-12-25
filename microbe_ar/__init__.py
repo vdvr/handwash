@@ -5,4 +5,4 @@ from microbe_ar.transformers import (
     add_image_with_alpha,
 )
 
-from microbe_ar.main import microbe_ar_feed
+from microbe_ar.qt_obj_thread import MicrobeARObj
