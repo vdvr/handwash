@@ -133,6 +133,35 @@ def draw_microbe_on_hand(image, microbe_img, landmark_result, microbe_data):
     return add_image_with_alpha(image, rot_microbe_img, center, microbe_data["opacity"])
 
 
+def draw_microbe_on_motion(image, microbe_img, motion_pos, microbe_data):
+    prev_x = microbe_data["pos"]["prev_x"]
+    prev_y = microbe_data["pos"]["prev_y"]
+
+    # no previously saved positions or angles in hand
+    if prev_x == None:
+        return image
+
+    # get closest pixel with motion
+    dist = np.sqrt((motion_pos[:, :, 0] - prev_x) ** 2 + (motion_pos[:, :, 1] - prev_y) ** 2)
+    min_idx = np.argmin(dist)
+    if dist[min_idx] > MOTION_MAX_DIST:
+        return image
+    min_pos = motion_pos[min_idx][0]
+    
+    # add little offset to closest pixel
+    min_pos[0] += random.randint(0, MOTION_MAX_RAND_OFFSET)
+    min_pos[1] += random.randint(0, MOTION_MAX_RAND_OFFSET)
+
+    # save position
+    microbe_data["pos"]["prev_x"], microbe_data["pos"]["prev_y"] = min_pos
+    
+    # rotate microbe
+    rot_microbe_img = rotate_img_uncropped(microbe_img, microbe_data["pos"]["prev_angle"])
+
+    return add_image_with_alpha(image, rot_microbe_img, min_pos, microbe_data["opacity"])
+
+
+
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
@@ -267,32 +296,7 @@ while cap.isOpened():
             # if hand not detected, use motion
             else:
                 try:
-                    prev_x = microbe["pos"]["prev_x"]
-                    prev_y = microbe["pos"]["prev_y"]
-
-                    # no previously saved positions or angles in hand
-                    if prev_x == None:
-                        break
-
-                    # get closest pixel with motion
-                    dist = np.sqrt((motion_pos[:, :, 0] - prev_x) ** 2 + (motion_pos[:, :, 1] - prev_y) ** 2)
-                    min_idx = np.argmin(dist)
-                    if dist[min_idx] > MOTION_MAX_DIST:
-                        continue
-                    min_pos = motion_pos[min_idx][0]
-                    
-                    # add little offset to closest pixel
-                    min_pos[0] += random.randint(0, MOTION_MAX_RAND_OFFSET)
-                    min_pos[1] += random.randint(0, MOTION_MAX_RAND_OFFSET)
-
-                    # save position
-                    microbe["pos"]["prev_x"], microbe["pos"]["prev_y"] = min_pos
-                    
-                    # rotate microbe
-                    rot_microbe_img = rotate_img_uncropped(microbe_img, microbe["pos"]["prev_angle"])
-                
-                    image = add_image_with_alpha(image, rot_microbe_img, min_pos, microbe["opacity"])
-
+                    image = draw_microbe_on_motion(image, microbe_img, motion_pos, microbe)
                 # error when motion_pos None (no movement), likely no hands
                 except TypeError:
                     pass
