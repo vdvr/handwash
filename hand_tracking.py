@@ -8,19 +8,22 @@ import itertools
 
 
 # parameters
-HISTORY = 2
+HISTORY = 5
 MOG2_THRESHOLD = 11
 KNN_THRESHOLD = 500
 
 MASK_NOISE_BLUR_RAD = 9
 
 MICROBE_MIN_HEIGHT = 30
-MICROBE_MAX_HEIGHT = 50
+MICROBE_MAX_HEIGHT = 40
 MICROBE_MIN_AMOUNT = 10
 MICROBE_MAX_AMOUNT = 15
 
 OPACITY_DECR = .05
 OPACITY_DECR_ODD = .01
+
+MOTION_MAX_DIST = 50
+MOTION_MAX_RAND_OFFSET = 2
 
 MIN_DETECTION_CONFIDENCE = .7
 MIN_TRACKING_CONFIDENCE = .5
@@ -111,6 +114,7 @@ def draw_microbe_on_hand(image, microbe_img, landmark_result, microbe_data):
     angle = angle + microbe_data["pos"]["angle"]
     rot_microbe_img = rotate_img_uncropped(microbe_img, angle)
 
+    # get microbe center on image
     center_x = landmark_dx * microbe_data["pos"]["distance_n"] + landmark_an.x
     center_y = landmark_dy * microbe_data["pos"]["distance_n"] + landmark_an.y
 
@@ -120,6 +124,10 @@ def draw_microbe_on_hand(image, microbe_img, landmark_result, microbe_data):
     )
 
     #microbe["image"] = resize_img_hand_distance(microbe_img, results, MICROBE_BASE_HEIGHT, scale=1)
+
+    # save position and angle in case needed in next iteration
+    microbe_data["pos"]["prev_x"], microbe_data["pos"]["prev_y"] = center
+    microbe_data["pos"]["prev_angle"] = angle
     
     # add microbe image to base image
     return add_image_with_alpha(image, rot_microbe_img, center, microbe_data["opacity"])
@@ -170,6 +178,10 @@ for _ in range(microbes_n):
                 "connection": conn_loc,
                 "distance_n": random.randint(100, 900) / 1000.0,
                 "angle": random.randint(0, 359),
+
+                "prev_x": None,
+                "prev_y": None,
+                "prev_angle": None,
             },
             "size": 
             {
@@ -203,21 +215,24 @@ while cap.isOpened():
         cv.COLOR_BGR2RGB
     )
     
-    # detect nodes (joints and palm)
+    # detect landmakrs on hand
     results = hands.process(image)
+
+    # convert image back to native opencv BGR, TODO: remove in production if displayed in Qt
+    image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
 
     # create motion mask with background substraction
     motion_mask = back_sub.apply(image)
-    motion_loc = None
-    if results.multi_hand_landmarks:
+    
+    # if both hands not detected
+    if (not results.multi_hand_landmarks) or (len(results.multi_hand_landmarks) < 2):
         # motion mask noise reduction with median blur
         motion_mask = cv.medianBlur(
             motion_mask,
             MASK_NOISE_BLUR_RAD
         )
 
-    # convert image back to native opencv BGR, TODO: remove in production if displayed in Qt
-    image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
+        motion_pos = cv.findNonZero(motion_mask)
 
     for hand_name in HAND_LABELS:
         # try to get hand index
@@ -233,11 +248,10 @@ while cap.isOpened():
         else: 
             hand_i = None
 
-        
         # decrease opacity
-        for i, microbe in enumerate(microbe_data[hand]):
+        for i, microbe in enumerate(microbe_data[hand_name]):
             if microbe["opacity"] <= 0:
-                microbe_data[hand].pop(i)
+                microbe_data[hand_name].pop(i)
             elif (microbe["opacity"] < 1) or (random.random() <= OPACITY_DECR_ODD):
                 microbe["opacity"] -= OPACITY_DECR
 
@@ -245,27 +259,50 @@ while cap.isOpened():
             microbe_img = microbe_imgs[microbe["image_nr"]]
             microbe_img = cv.resize(microbe_img, (microbe["size"]["width"], microbe["size"]["width"]))
 
+            # if hand detected, use landmark connections
             if hand_i != None:
                 landmark_result = results.multi_hand_landmarks[hand_i]
                 image = draw_microbe_on_hand(image, microbe_img, landmark_result, microbe)
-    
-            else:         
-                # draw microbes on random locations on motion
-                if motion_loc == None:
-                    motion_loc = np.where(motion_mask >= 127)
-                    
-                    if len(motion_loc[0] > 0):
-                        motion_loc = list(zip(motion_loc[1], motion_loc[0]))
 
-                pos = random.choice(motion_loc)
-                image = add_image_with_alpha(image, microbe_img, pos, microbe["opacity"])
+            # if hand not detected, use motion
+            else:
+                try:
+                    prev_x = microbe["pos"]["prev_x"]
+                    prev_y = microbe["pos"]["prev_y"]
+
+                    # no previously saved positions or angles in hand
+                    if prev_x == None:
+                        break
+
+                    # get closest pixel with motion
+                    dist = np.sqrt((motion_pos[:, :, 0] - prev_x) ** 2 + (motion_pos[:, :, 1] - prev_y) ** 2)
+                    min_idx = np.argmin(dist)
+                    if dist[min_idx] > MOTION_MAX_DIST:
+                        continue
+                    min_pos = motion_pos[min_idx][0]
+                    
+                    # add little offset to closest pixel
+                    min_pos[0] += random.randint(0, MOTION_MAX_RAND_OFFSET)
+                    min_pos[1] += random.randint(0, MOTION_MAX_RAND_OFFSET)
+
+                    # save position
+                    microbe["pos"]["prev_x"], microbe["pos"]["prev_y"] = min_pos
+                    
+                    # rotate microbe
+                    rot_microbe_img = rotate_img_uncropped(microbe_img, microbe["pos"]["prev_angle"])
+                
+                    image = add_image_with_alpha(image, rot_microbe_img, min_pos, microbe["opacity"])
+
+                # error when motion_pos None (no movement), likely no hands
+                except TypeError:
+                    pass
+
         
 
     # show image and close window with ESC
     cv.imshow('Microbes', image)
     if cv.waitKey(5) & 0xFF == 27:
         break
-
 
 # exit gracefully
 hands.close()
