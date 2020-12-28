@@ -85,6 +85,7 @@ class StepUI(QWidget):
         if usingAR:
             self.mediaView.setAlignment(Qt.AlignLeft)
             self.bottomLayout.addWidget(self.mediaView)
+            self.bottomLayout.addStretch(1)
         self.dateTime = DateTimeWidget(main=False)
         self.bottomLayout.addWidget(self.dateTime)
 

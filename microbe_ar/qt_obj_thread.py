@@ -111,8 +111,6 @@ class MicrobeARObj(QObject):
 
             for hand_name in HAND_LABELS:
                 # try to get hand index
-
-                print(results.multi_handedness)
                 if results.multi_hand_landmarks:
                     try:
                         hand_i = next(
