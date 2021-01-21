@@ -16,7 +16,7 @@ sudo ln -s $(pwd) /usr/share/handwash
 sudo tee /etc/systemd/system/handwash-ui.service > /dev/null <<EOF
 [Unit]
 Description=handwash GUI service
-After=graphical.target
+After=multi-user.target
 StartLimitIntervalSec=0
 [Service]
 Environment="DISPLAY=:0"
