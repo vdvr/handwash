@@ -4,11 +4,11 @@ steps:
   - Nat maken:
       description: Maak je handen nat
       displayPath: res/videos/who_1_wet-vp9.webm
-      water: True
+      durationS: 5
   - Inzepen:
       description: Neem zeep uit de zeepdispenser
       displayPath: res/videos/who_2_soap-vp9.webm
-      soap: True
+      durationS: 5
   - Handpalmen:
       description: Wrijf de handpalmen tegen elkaar
       durationS: 5
@@ -36,7 +36,7 @@ steps:
   - Spoelen:
       description: Spoel de zeep van je handen
       displayPath: res/videos/who_9_rinse-vp9.webm
-      water: True
+      durationS: 5
   - Drogen:
       description: Droog je handen met een wegwerpdoekje of handdroger
       durationS: 5

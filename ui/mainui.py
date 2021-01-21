@@ -1,7 +1,6 @@
 from . import StepUI, IdleUI
 import enum
 import locale
-import sysv_ipc
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 from PyQt5.QtWidgets import (
     QMainWindow
@@ -25,12 +24,6 @@ class MainUI(QMainWindow):
         self.setCursor(Qt.BlankCursor)
 
         locale.setlocale(locale.LC_TIME, timeLocale)
-
-        rq = sysv_ipc.MessageQueue(12345, sysv_ipc.IPC_CREAT)
-        sq = sysv_ipc.MessageQueue(778899, sysv_ipc.IPC_CREAT)
-
-        self.sender = sq
-        self.receiver = rq
 
         if styleFile != None:
             with open(styleFile) as styleFileObj:
@@ -104,20 +97,8 @@ class MainUI(QMainWindow):
 
 
     def sendMsg(self, cmd, args):
-        payload = chr(cmd.value) + ';' + args
-        print("mainui.py:sendMsg " + payload)
-        self.sender.send(payload, True, type=1)
+        pass
 
 
     def getMsg(self):
-        try:
-            payload = self.receiver.receive(block=False)
-        except:
-            return
-        (payload, payload_type) = payload
-        payload = payload.decode("utf-8").split('\x00', 1)[0]
-        print("mainui.py:getMsg " + payload)
-        if payload:
-            payload.split(';')
-            cmd = Cmd(ord(payload[0]))
-            return {"cmd": cmd, "args": payload[1:]}
+        pass

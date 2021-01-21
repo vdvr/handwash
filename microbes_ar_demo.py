@@ -5,7 +5,7 @@ import glob
 from PyQt5.QtWidgets import QApplication
 from time import sleep
 
-from . import (
+from ui import (
     Step, 
     StepUI,
     IdleUI,
