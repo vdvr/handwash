@@ -3,6 +3,8 @@ import mediapipe as mp
 import glob
 import random
 import itertools
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QImage
 from .constants import *
@@ -76,19 +78,19 @@ class MicrobeARObj(QObject):
             min_tracking_confidence=MIN_TRACKING_CONFIDENCE,
         )
 
-
         # read frames
-        cap = cv.VideoCapture(0)
-        while cap.isOpened():
-            success, image = cap.read()
-            if not success:
-                break
+        with PiCamera() as camera:
+            camera.resolution = RESOLUTION
+            camera.framerate = FRAMERATE
+            
+        
+            with PiRGBArray(camera, size=RESOLUTION) as rawCap:
+                camera.capture(rawCap, format="rgb", use_video_port=True)
 
-            # convert flipped image to RGB 
-            image = cv.cvtColor(
-                cv.flip(image, 1),
-                cv.COLOR_BGR2RGB
-            )
+                image = rawCap.array
+
+            # flip image
+            image = cv.flip(image, 1)
             
             # detect landmarks on hand
             results = hands.process(image)

@@ -12,6 +12,12 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 make -C rpicom all
 sudo ln -s $(pwd) /usr/share/handwash
 
+#enable picam
+sudo tee -a /boot/config.txt > /dev/null <<EOF
+start_x=1
+gpu_mem=128
+EOF
+
 # create systemd services
 sudo tee /etc/systemd/system/handwash-ui.service > /dev/null <<EOF
 [Unit]
@@ -50,8 +56,9 @@ EOF
 
 # install dependencies
 sudo apt update
-sudo apt install libvlc-dev python3 python3-pyqt5 python3-pyqt5.qtsvg
-sudo apt-get install gcc-avr binutils-avr gdb-avr avr-libc avrdude
+sudo apt install -y libvlc-dev python3 python3-pyqt5 python3-pyqt5.qtsvg
+sudo apt install -y gcc-avr binutils-avr gdb-avr avr-libc avrdude
+sudo apt install -y libatlas-base-dev libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev  libqtgui4  libqt4-test
 
 # enable systemd services
 sudo systemctl enable handwash-worker.service

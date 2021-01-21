@@ -19,6 +19,7 @@ sympy = "*"
 nose = "*"
 opencv-contrib-python = "*"
 mediapipe = "*"
+picamera = "*"
 
 [requires]
 python_version = "3.7"
