@@ -3,41 +3,41 @@ startText: Steek je handen onder de kraan om te beginnen...
 steps:
   - Nat maken:
       description: Maak je handen nat
-      displayPath: res/videos/who_1_wet-vp9.webm
+      displayPath: res/videos/who_1_wet.mp4
       durationS: 5
   - Inzepen:
       description: Neem zeep uit de zeepdispenser
-      displayPath: res/videos/who_2_soap-vp9.webm
+      displayPath: res/videos/who_2_soap.mp4
       durationS: 5
   - Handpalmen:
       description: Wrijf de handpalmen tegen elkaar
       durationS: 5
-      displayPath: res/videos/who_3_rub-vp9.webm
+      displayPath: res/videos/who_3_rub.mp4
   - Gekruist rug:
       description: Wrijf de rechterhandpalm met gekruiste vingers over de linkerhandrug en andersom
       durationS: 5
-      displayPath: res/videos/who_4_dorsal-vp9.webm
+      displayPath: res/videos/who_4_dorsal.mp4
   - Gekruist palm:
       description: Wrijf de handpalmen met gekruiste vingers tegen elkaar
       durationS: 5
-      displayPath: res/videos/who_5_cross-vp9.webm
+      displayPath: res/videos/who_5_cross.mp4
   - Vingers vuist: 
       description: Wrijf je vingers in de vuist van de andere hand
       durationS: 5
-      displayPath: res/videos/who_6_fingers-vp9.webm
+      displayPath: res/videos/who_6_fingers.mp4
   - Duim:
       description: Maak cirkels met je rechterduim in je linkerhand en andersom
       durationS: 5
-      displayPath: res/videos/who_7_thumbs-vp9.webm
+      displayPath: res/videos/who_7_thumbs.mp4
   - Palm vingertop:
       description: Maak cirkels met je vingertoppen in je handpalmen
       durationS: 5
-      displayPath: res/videos/who_8_palm-vp9.webm
+      displayPath: res/videos/who_8_palm.mp4
   - Spoelen:
       description: Spoel de zeep van je handen
-      displayPath: res/videos/who_9_rinse-vp9.webm
+      displayPath: res/videos/who_9_rinse.mp4
       durationS: 5
   - Drogen:
       description: Droog je handen met een wegwerpdoekje of handdroger
       durationS: 5
-      displayPath: res/videos/who_10_dry-vp9.webm
+      displayPath: res/videos/who_10_dry.mp4
