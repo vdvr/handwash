@@ -43,7 +43,7 @@ class StepUI(QWidget):
         # Add layouts, step photo and description to main layout
         self.mainLayout.addLayout(self.topLayout, 2)
         
-        self.mediaView = MediaView()
+        # self.mediaView = MediaView()
 
         self.usingAR = usingAR
         if usingAR:
@@ -51,9 +51,9 @@ class StepUI(QWidget):
             self.videoFeed.resize(*DIM)
             self.videoFeed.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.mainLayout.addWidget(self.videoFeed, 6)
-        else:
-            self.mainLayout.addWidget(self.mediaView, 6)
-            self.mediaView.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        # else:
+        #     self.mainLayout.addWidget(self.mediaView, 6)
+        #     self.mediaView.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
         self.stepDescLbl = QLabel()
         self.stepDescLbl.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
@@ -82,10 +82,10 @@ class StepUI(QWidget):
         self.stepLayout.setSpacing(0)
         self.topLayout.addLayout(self.stepLayout)
 
-        if usingAR:
-            self.mediaView.setAlignment(Qt.AlignLeft)
-            self.bottomLayout.addWidget(self.mediaView)
-            self.bottomLayout.addStretch(1)
+        # if usingAR:
+        #     self.mediaView.setAlignment(Qt.AlignLeft)
+        #     self.bottomLayout.addWidget(self.mediaView)
+        #     self.bottomLayout.addStretch(1)
         self.dateTime = DateTimeWidget(main=False)
         self.bottomLayout.addWidget(self.dateTime)
 
@@ -106,7 +106,7 @@ class StepUI(QWidget):
         # Exit if no steps left
         stepsLeft = len(self.stepQueue)
         if stepsLeft < 1:
-            self.mediaView.mediaplayer.stop()
+            # self.mediaView.mediaplayer.stop()
             self.finished.emit()
             return
 
@@ -125,7 +125,7 @@ class StepUI(QWidget):
         self.stepDescLbl.setText(self.currentStep.description)
         
         # Update UI image
-        self.mediaView.setSource(self.currentStep.displayPath)
+        # self.mediaView.setSource(self.currentStep.displayPath)
         
         # Start timer to decrease time left label
         if durationS != None:
