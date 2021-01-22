@@ -140,7 +140,7 @@ class MicrobeARObj(QObject):
                         try:
                             image = draw_microbe_on_motion(image, microbe["image"], motion_pos, microbe)
                         # error when motion_pos None (no movement), likely no hands
-                        except TypeError:
+                        except (TypeError, UnboundLocalError):
                             pass
 
             # convert opencv image to qt image
